@@ -1,0 +1,61 @@
+{
+    "moneda": "CRC",
+    "categorias": [
+        {
+            "id": "kata-infantil",
+            "nombre": "Kata Infantil",
+            "bloqueEdad": "infantil",
+            "precio": 15000,
+            "descripcion": "Competencia de formas (4-5 años)"
+        },
+        {
+            "id": "kumite-infantil",
+            "nombre": "Kumite Infantil",
+            "bloqueEdad": "infantil",
+            "precio": 15000,
+            "descripcion": "Combate (4-5 años)"
+        },
+        {
+            "id": "kata-juvenil",
+            "nombre": "Kata Juvenil",
+            "bloqueEdad": "juvenil",
+            "precio": 15000,
+            "descripcion": "Competencia de formas (6-12 años)"
+        },
+        {
+            "id": "kumite-juvenil",
+            "nombre": "Kumite Juvenil",
+            "bloqueEdad": "juvenil",
+            "precio": 18000,
+            "descripcion": "Combate (6-12 años)"
+        },
+        {
+            "id": "kata-adolescentes",
+            "nombre": "Kata Adolescentes",
+            "bloqueEdad": "adolescentes",
+            "precio": 18000,
+            "descripcion": "Competencia de formas (13-17 años)"
+        },
+        {
+            "id": "kumite-adolescentes",
+            "nombre": "Kumite Adolescentes",
+            "bloqueEdad": "adolescentes",
+            "precio": 20000,
+            "descripcion": "Combate (13-17 años)"
+        },
+        {
+            "id": "kata-adultos",
+            "nombre": "Kata Adultos",
+            "bloqueEdad": "adultos",
+            "precio": 20000,
+            "descripcion": "Competencia de formas (18+)"
+        },
+        {
+            "id": "kumite-adultos",
+            "nombre": "Kumite Adultos",
+            "bloqueEdad": "adultos",
+            "precio": 22000,
+            "descripcion": "Combate (18+)"
+        }
+    ]
+}

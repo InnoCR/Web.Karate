@@ -1,0 +1,449 @@
+/* =========================================================
+   GUANA-CUP 2026 · landing.css
+   Estilos de la Vista 0: hero, contador, info,
+   categorías y CTA final
+   ========================================================= */
+
+/* ------------------------------
+   1. HERO
+   ------------------------------ */
+.hero {
+    position: relative;
+    overflow: hidden;
+    padding: var(--space-xl) 0 var(--space-lg);
+    background:
+        radial-gradient(circle at 20% 20%, rgba(200, 16, 46, .25), transparent 55%),
+        radial-gradient(circle at 80% 80%, rgba(212, 175, 55, .10), transparent 55%),
+        linear-gradient(180deg, #0a0a0a 0%, #150505 60%, #0a0a0a 100%);
+    border-bottom: 1px solid var(--color-border);
+}
+
+/* Capa decorativa tipo "pincelada" */
+.hero-bg {
+    position: absolute;
+    inset: 0;
+    background-image:
+        radial-gradient(rgba(200, 16, 46, .08) 1px, transparent 1px);
+    background-size: 24px 24px;
+    opacity: .35;
+    pointer-events: none;
+}
+
+.hero-inner {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-lg);
+    align-items: center;
+}
+
+/* En desktop: texto izquierda, póster derecha */
+@media (min-width: 900px) {
+    .hero-inner {
+        grid-template-columns: 1.1fr 0.9fr;
+        gap: var(--space-xl);
+    }
+}
+
+.hero-content {
+    text-align: center;
+    animation: fadeIn var(--t-slow);
+}
+
+@media (min-width: 900px) {
+    .hero-content {
+        text-align: left;
+    }
+}
+
+.hero-eyebrow {
+    font-family: var(--font-display);
+    text-transform: uppercase;
+    letter-spacing: .25em;
+    font-size: .8rem;
+    color: var(--color-gold);
+    margin-bottom: .75rem;
+}
+
+.hero-title {
+    font-family: var(--font-display);
+    font-weight: 700;
+    line-height: .95;
+    margin-bottom: .5rem;
+}
+
+.hero-title-line1 {
+    display: block;
+    font-size: clamp(2.75rem, 9vw, 5.5rem);
+    color: #fff;
+    letter-spacing: .02em;
+    text-shadow: 0 4px 20px rgba(0, 0, 0, .6);
+}
+
+.hero-title-line2 {
+    display: block;
+    font-size: clamp(2.25rem, 8vw, 5rem);
+    color: var(--color-primary);
+    letter-spacing: .01em;
+    text-shadow: 0 4px 24px rgba(200, 16, 46, .5);
+}
+
+.hero-values {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5rem;
+    justify-content: center;
+    font-family: var(--font-display);
+    text-transform: uppercase;
+    letter-spacing: .2em;
+    font-size: .78rem;
+    color: var(--color-text-muted);
+    margin: .75rem 0 1.25rem;
+}
+
+@media (min-width: 900px) {
+    .hero-values {
+        justify-content: flex-start;
+    }
+}
+
+.hero-values .dot {
+    color: var(--color-primary);
+}
+
+.hero-torneo {
+    font-family: var(--font-display);
+    font-size: clamp(1.5rem, 4vw, 2.25rem);
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    margin-bottom: .25rem;
+}
+
+.hero-torneo strong {
+    color: var(--color-gold);
+    font-weight: 700;
+}
+
+.hero-slogan {
+    font-style: italic;
+    color: var(--color-text-muted);
+    font-size: 1.05rem;
+    margin-bottom: var(--space-md);
+}
+
+.hero-cta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .75rem;
+    justify-content: center;
+    margin-top: var(--space-sm);
+}
+
+@media (min-width: 900px) {
+    .hero-cta {
+        justify-content: flex-start;
+    }
+}
+
+.hero-cta .btn {
+    flex: 1 1 auto;
+    min-width: 200px;
+}
+
+/* Póster */
+.hero-poster {
+    position: relative;
+    display: flex;
+    justify-content: center;
+}
+
+.hero-poster img {
+    width: 100%;
+    max-width: 420px;
+    border-radius: var(--radius-lg);
+    box-shadow:
+        0 20px 60px rgba(0, 0, 0, .7),
+        0 0 0 1px rgba(212, 175, 55, .15);
+    animation: posterFloat 6s ease-in-out infinite;
+}
+
+@keyframes posterFloat {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+/* ------------------------------
+   2. CONTADOR REGRESIVO
+   ------------------------------ */
+.contador-section {
+    padding: var(--space-lg) 0;
+    background: linear-gradient(180deg, #0a0a0a 0%, #140808 100%);
+    border-bottom: 1px solid var(--color-border);
+    text-align: center;
+}
+
+.contador-fecha {
+    font-family: var(--font-display);
+    text-transform: uppercase;
+    letter-spacing: .15em;
+    font-size: .95rem;
+    color: var(--color-text-muted);
+    margin-bottom: var(--space-md);
+}
+
+.contador-fecha strong {
+    color: var(--color-gold);
+}
+
+.contador-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: .5rem;
+    max-width: 640px;
+    margin: 0 auto;
+}
+
+@media (min-width: 640px) {
+    .contador-grid {
+        gap: 1rem;
+    }
+}
+
+.contador-item {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: .85rem .35rem;
+    box-shadow: var(--shadow-sm);
+    position: relative;
+    overflow: hidden;
+}
+
+.contador-item::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--color-primary), var(--color-gold));
+}
+
+.contador-num {
+    display: block;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(1.5rem, 6vw, 2.5rem);
+    color: #fff;
+    line-height: 1;
+    text-shadow: 0 2px 12px rgba(200, 16, 46, .35);
+}
+
+.contador-label {
+    display: block;
+    font-size: .7rem;
+    text-transform: uppercase;
+    letter-spacing: .15em;
+    color: var(--color-text-muted);
+    margin-top: .35rem;
+}
+
+.contador-estado {
+    margin-top: var(--space-md);
+    font-size: .9rem;
+    color: var(--color-text-muted);
+    font-style: italic;
+}
+
+/* ------------------------------
+   3. INFO DEL TORNEO
+   ------------------------------ */
+.info-section {
+    padding: var(--space-xl) 0;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    margin-top: var(--space-lg);
+}
+
+@media (min-width: 640px) {
+    .info-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (min-width: 960px) {
+    .info-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+.info-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-left: 4px solid var(--color-primary);
+    border-radius: var(--radius-md);
+    padding: 1.25rem;
+    transition: transform var(--t-fast), border-color var(--t-fast);
+}
+
+.info-card:hover {
+    transform: translateY(-4px);
+    border-left-color: var(--color-gold);
+}
+
+.info-card h3 {
+    font-family: var(--font-display);
+    font-size: .95rem;
+    text-transform: uppercase;
+    letter-spacing: .12em;
+    color: var(--color-gold);
+    margin-bottom: .5rem;
+}
+
+.info-card p {
+    color: var(--color-text);
+    font-size: .95rem;
+    line-height: 1.5;
+}
+
+.info-card a {
+    color: var(--color-primary-light);
+    font-weight: 600;
+    border-bottom: 1px solid transparent;
+    transition: border-color var(--t-fast);
+}
+
+.info-card a:hover {
+    border-bottom-color: var(--color-primary-light);
+}
+
+.valores-tag {
+    text-align: center;
+    margin-top: var(--space-lg);
+    font-family: var(--font-display);
+    text-transform: uppercase;
+    letter-spacing: .3em;
+    font-size: .85rem;
+    color: var(--color-text-dim);
+}
+
+/* ------------------------------
+   4. CATEGORÍAS
+   ------------------------------ */
+.categorias-section {
+    padding: var(--space-xl) 0;
+    background: var(--color-bg-alt);
+    border-top: 1px solid var(--color-border);
+    border-bottom: 1px solid var(--color-border);
+}
+
+.categorias-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    margin-top: var(--space-lg);
+}
+
+@media (min-width: 640px) {
+    .categorias-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (min-width: 960px) {
+    .categorias-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+.categoria-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
+    position: relative;
+    transition: transform var(--t-fast), border-color var(--t-fast);
+}
+
+.categoria-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--color-gold);
+}
+
+.categoria-bloque {
+    font-family: var(--font-display);
+    text-transform: uppercase;
+    letter-spacing: .15em;
+    font-size: .7rem;
+    color: var(--color-primary-light);
+}
+
+.categoria-nombre {
+    font-family: var(--font-display);
+    font-size: 1.15rem;
+    text-transform: uppercase;
+    color: #fff;
+    line-height: 1.2;
+}
+
+.categoria-desc {
+    color: var(--color-text-muted);
+    font-size: .85rem;
+    flex: 1;
+}
+
+.categoria-precio {
+    font-family: var(--font-display);
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: var(--color-gold);
+    margin-top: .25rem;
+}
+
+/* ------------------------------
+   5. CTA FINAL
+   ------------------------------ */
+.cta-final {
+    padding: var(--space-xl) 0;
+    background:
+        radial-gradient(circle at 50% 50%, rgba(200, 16, 46, .22), transparent 65%),
+        linear-gradient(180deg, #0a0a0a 0%, #150505 100%);
+    border-top: 1px solid var(--color-border);
+    text-align: center;
+}
+
+.cta-final-inner {
+    max-width: 640px;
+}
+
+.cta-final h2 {
+    font-family: var(--font-display);
+    font-size: clamp(1.75rem, 5vw, 2.5rem);
+    color: #fff;
+    text-transform: uppercase;
+    margin-bottom: .5rem;
+}
+
+.cta-final p {
+    color: var(--color-text-muted);
+    margin-bottom: var(--space-md);
+}
+
+.cta-final p strong {
+    color: var(--color-gold);
+}
