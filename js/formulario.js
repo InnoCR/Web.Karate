@@ -6,7 +6,8 @@
    - Peso y altura obligatorios
    - Precio fijo desde config
    - Sin categorías
-   - Envío al backend (App Script) con folio de respuesta
+   - Envío OBLIGATORIO al backend con folio de respuesta
+   - Sin fallback local: si falla, muestra error y no avanza
    ========================================================= */
 
 (function () {
@@ -377,22 +378,13 @@
     }
 
     // ======================================================
-    // FOLIO LOCAL (fallback)
-    // ======================================================
-    function generarFolioLocal() {
-        const year = new Date().getFullYear();
-        const aleatorio = Math.floor(Math.random() * 9999).toString().padStart(4, '0');
-        return `GC${year}-${aleatorio}`;
-    }
-
-    // ======================================================
     // RECOLECCIÓN DE DATOS
     // ======================================================
     function recolectarDatos() {
         const cfg = window.APP.config;
 
         const datos = {
-            folio: state.folio,  // aún no generado aquí
+            folio: state.folio,
             competidor: {
                 nombre: $('#nombreCompleto')?.value.trim() || '',
                 fechaNacimiento: formatearFechaNacimiento(),
@@ -493,46 +485,75 @@
 
     // ======================================================
     // ENVIAR AL BACKEND (App Script)
-    // ------------------------------------------------------
-    // - Si hay endpoint configurado, envía los datos
-    // - El backend devuelve { folio: "GC2026-XXXX" }
-    // - Si no hay endpoint, retorna null → usa folio local
+    // Lanza error si falla. El caller decide qué hacer.
     // ======================================================
     async function enviarAlBackend(datos) {
         const cfg = window.APP.config || {};
         const url = cfg.endpointInscripcion;
 
         if (!url) {
-            console.warn('[formulario.js] No hay endpoint configurado. Usando folio local.');
-            return null;
+            throw new Error('El endpoint de inscripción no está configurado. Contacta al organizador.');
         }
 
-        try {
-            const res = await fetch(url, {
-                method: 'POST',
-                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                body: JSON.stringify(datos)
-            });
+        const res = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify(datos)
+        });
 
-            if (!res.ok) {
-                throw new Error(`HTTP ${res.status}`);
-            }
-
-            const data = await res.json();
-
-            if (data && data.folio) {
-                return { folio: data.folio };
-            }
-            return null;
-
-        } catch (err) {
-            console.error('[formulario.js] Error al enviar al backend:', err);
-            return null;
+        if (!res.ok) {
+            throw new Error(`Error del servidor (HTTP ${res.status})`);
         }
+
+        const data = await res.json();
+
+        if (!data || !data.ok) {
+            throw new Error(data?.error || 'Respuesta inválida del servidor');
+        }
+
+        return data;
+    }
+
+    // ======================================================
+    // MENSAJES DE ERROR DEL BACKEND
+    // ======================================================
+    function mostrarErrorBackend(mensaje) {
+        const nav = document.querySelector('.form-nav');
+        if (!nav) return;
+
+        limpiarErrorBackend();
+
+        const div = document.createElement('div');
+        div.id = 'errorBackend';
+        div.style.cssText = `
+      background: rgba(255,77,77,.08);
+      border-left: 4px solid var(--color-error);
+      border-radius: var(--radius-sm);
+      padding: .85rem 1rem;
+      margin-top: 1rem;
+      color: var(--color-error);
+      font-size: .9rem;
+      line-height: 1.5;
+      text-align: left;
+    `;
+        div.innerHTML = `
+      <strong>⚠️ No se pudo completar la inscripción</strong><br>
+      ${mensaje}<br>
+      <small>Si el problema persiste, contacta al organizador por WhatsApp.</small>
+    `;
+
+        nav.insertAdjacentElement('afterend', div);
+        div.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    function limpiarErrorBackend() {
+        const prev = document.getElementById('errorBackend');
+        if (prev) prev.remove();
     }
 
     // ======================================================
     // CONFIRMAR INSCRIPCIÓN
+    // Si el backend falla, muestra error y NO avanza.
     // ======================================================
     async function confirmar() {
         // Validar todos los pasos
@@ -547,34 +568,42 @@
 
         const datos = recolectarDatos();
 
-        // Bloquear botón y mostrar estado
+        limpiarErrorBackend();
+
         if (refs.btnConfirmar) {
             refs.btnConfirmar.disabled = true;
             refs.btnConfirmar.textContent = '⏳ Enviando…';
         }
 
+        let respuesta;
         try {
-            // Enviar al backend
-            const respuesta = await enviarAlBackend(datos);
-
-            if (respuesta && respuesta.folio) {
-                datos.folio = respuesta.folio;
-            } else {
-                // Fallback: folio local
-                datos.folio = generarFolioLocal();
-            }
-
+            respuesta = await enviarAlBackend(datos);
         } catch (err) {
-            console.error('[formulario.js] Error inesperado:', err);
-            datos.folio = generarFolioLocal();
-        } finally {
+            console.error('[formulario.js] Error al confirmar:', err);
+            mostrarErrorBackend(
+                err.message || 'No se pudo conectar con el servidor. Verifica tu conexión e intenta de nuevo.'
+            );
             if (refs.btnConfirmar) {
                 refs.btnConfirmar.disabled = false;
                 refs.btnConfirmar.textContent = '✔ Confirmar inscripción';
             }
+            return;
         }
 
+        if (!respuesta || !respuesta.folio) {
+            const msg = respuesta?.error || 'No se recibió un folio válido del servidor.';
+            mostrarErrorBackend(msg);
+            if (refs.btnConfirmar) {
+                refs.btnConfirmar.disabled = false;
+                refs.btnConfirmar.textContent = '✔ Confirmar inscripción';
+            }
+            return;
+        }
+
+        // ✅ Éxito
+        datos.folio = respuesta.folio;
         state.folio = datos.folio;
+
         const datosFinales = JSON.parse(JSON.stringify(datos));
         state.datos = datosFinales;
         state.confirmado = true;
@@ -589,6 +618,11 @@
         pintarConfirmacion(datosFinales);
         window.Navegacion.irA('confirmacion');
         limpiarFormulario();
+
+        if (refs.btnConfirmar) {
+            refs.btnConfirmar.disabled = false;
+            refs.btnConfirmar.textContent = '✔ Confirmar inscripción';
+        }
     }
 
     // ======================================================
@@ -606,6 +640,8 @@
         const edadInput = $('#edadCalculada');
         if (edadInput) edadInput.value = '';
 
+        limpiarErrorBackend();
+
         refs.pasos.forEach(p => p.classList.remove('activo'));
         const paso1 = refs.pasos.find(p => Number(p.dataset.paso) === 1);
         if (paso1) paso1.classList.add('activo');
@@ -615,24 +651,21 @@
     }
 
     // ======================================================
-    // PINTAR CONFIRMACIÓN (simplificada)
+    // PINTAR CONFIRMACIÓN
     // ======================================================
     function pintarConfirmacion(datos) {
         const cfg = window.APP.config;
         const simbolo = cfg.simboloMoneda || '₡';
 
-        // Label del folio: "Folio de [Nombre]"
         const folioLabel = $('#folioLabel');
         if (folioLabel) {
             const nombre = datos.competidor.nombre || 'participante';
             folioLabel.textContent = `Folio de ${nombre}`;
         }
 
-        // Folio
         const folioTexto = $('#folioTexto');
         if (folioTexto) folioTexto.textContent = datos.folio || '—';
 
-        // Monto dentro del SINPE
         const sinpeMonto = $('#sinpeMonto');
         if (sinpeMonto) {
             sinpeMonto.textContent = window.formatMoneda(datos.total, simbolo, cfg.locale);
@@ -653,7 +686,6 @@
         refs.btnAnterior?.addEventListener('click', () => irAPaso(state.pasoActual - 1));
         refs.btnConfirmar?.addEventListener('click', confirmar);
 
-        // Fecha de nacimiento
         ['#diaNacimiento', '#mesNacimiento', '#anioNacimiento'].forEach(sel => {
             const el = $(sel);
             if (!el) return;
@@ -663,7 +695,6 @@
             });
         });
 
-        // Descargar PDF de nuevo
         $('#btnDescargarLiberacion')?.addEventListener('click', () => {
             if (!state.datos) {
                 alert('No hay datos de inscripción para descargar.');
@@ -672,7 +703,6 @@
             window.PDF.descargarPDF(state.datos);
         });
 
-        // WhatsApp
         $('#btnEnviarWhatsapp')?.addEventListener('click', () => {
             if (!state.datos) {
                 alert('No hay datos de inscripción para enviar.');
@@ -681,7 +711,6 @@
             window.WhatsApp.abrirWhatsApp(state.datos);
         });
 
-        // Contactar asesor
         $('#btnContactarAsesorHero')?.addEventListener('click', () => {
             window.WhatsApp.contactarAsesor();
         });
@@ -689,7 +718,6 @@
             window.WhatsApp.contactarAsesor();
         });
 
-        // Reset al volver al formulario tras confirmar
         document.addEventListener('vista:change', (e) => {
             if (e.detail.vista === 'formulario' && state.confirmado) {
                 resetCompleto();
@@ -711,7 +739,6 @@
         state.iniciado = true;
     }
 
-    // API pública
     window.Formulario = {
         irAPaso,
         reset: resetCompleto,
