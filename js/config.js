@@ -1,7 +1,7 @@
 /* =========================================================
    GUANA-CUP 2026 · config.js
-   Carga config.json y categorias.json, los expone globalmente
-   y aplica los datos dinámicos al DOM de la landing.
+   Carga config.json, lo expone globalmente y aplica los
+   datos dinámicos al DOM de la landing.
    ========================================================= */
 
 (function () {
@@ -11,11 +11,10 @@
     // Estado global del sitio
     // ------------------------------------------------------
     window.APP = {
-        config: null,          // objeto config.json
-        categorias: [],        // array de categorías
-        bloquesEdad: [],       // array de bloques de edad
+        config: null,
+        bloquesEdad: [],
         inscripcionesActivas: false,
-        listo: false           // bandera para saber si ya cargó todo
+        listo: false
     };
 
     // ------------------------------------------------------
@@ -110,9 +109,7 @@
         // Info del torneo
         const infoHora = $('#infoHora');
         if (infoHora) {
-            infoHora.textContent = cfg.horaInicio
-                ? cfg.horaInicio
-                : 'Por confirmar';
+            infoHora.textContent = cfg.horaInicio || 'Por confirmar';
         }
 
         const infoCierre = $('#infoCierre');
@@ -135,7 +132,7 @@
             infoWhatsapp.rel = 'noopener';
         }
 
-        // SINPE en confirmación
+        // SINPE en la vista de confirmación
         const sinpeNumero = $('#sinpeNumero');
         if (sinpeNumero && cfg.sinpe) sinpeNumero.textContent = cfg.sinpe.numero;
 
@@ -154,6 +151,17 @@
             ctaFechaLimite.textContent = formatFechaLarga(cfg.fechaLimiteInscripcion);
         }
 
+        // Precio y categoría única en la landing
+        const infoPrecio = $('#infoPrecio');
+        if (infoPrecio) {
+            infoPrecio.textContent = formatMoneda(cfg.precioInscripcion, cfg.simboloMoneda, cfg.locale);
+        }
+
+        const infoCategoria = $('#infoCategoria');
+        if (infoCategoria) {
+            infoCategoria.textContent = cfg.categoriaUnica || '';
+        }
+
         // Estado de inscripciones
         aplicarEstadoInscripciones();
     }
@@ -164,7 +172,6 @@
     function aplicarEstadoInscripciones() {
         const activas = window.APP.inscripcionesActivas;
 
-        // Botones que llevan al formulario
         $$('[data-nav="formulario"]').forEach(btn => {
             if (!activas) {
                 btn.disabled = true;
@@ -175,16 +182,12 @@
             }
         });
 
-        // Aviso en contador
         const estado = $('#contadorEstado');
-        if (estado) {
-            if (!activas) {
-                estado.textContent = '⚠️ Las inscripciones están cerradas. Contacta al organizador por WhatsApp.';
-                estado.style.color = 'var(--color-warning)';
-            }
+        if (estado && !activas) {
+            estado.textContent = '⚠️ Las inscripciones están cerradas. Contacta al organizador por WhatsApp.';
+            estado.style.color = 'var(--color-warning)';
         }
 
-        // Mensaje en CTA final
         const ctaTitulo = $('.cta-final h2');
         const ctaTexto = $('.cta-final p');
         if (!activas && ctaTitulo && ctaTexto) {
@@ -198,25 +201,18 @@
     // ------------------------------------------------------
     async function init() {
         try {
-            const [config, categorias] = await Promise.all([
-                cargarJSON('data/config.json'),
-                cargarJSON('data/categorias.json')
-            ]);
+            const config = await cargarJSON('data/config.json');
 
             window.APP.config = config;
             window.APP.bloquesEdad = config.bloquesEdad || [];
-            window.APP.categorias = categorias.categorias || [];
             window.APP.inscripcionesActivas = calcularInscripcionesActivas(config);
             window.APP.listo = true;
 
-            // Aplicar datos al DOM
             aplicarDatosLanding();
 
-            // Disparar evento para que otros scripts reaccionen
             document.dispatchEvent(new CustomEvent('app:listo', {
                 detail: {
                     config: window.APP.config,
-                    categorias: window.APP.categorias,
                     bloquesEdad: window.APP.bloquesEdad,
                     inscripcionesActivas: window.APP.inscripcionesActivas
                 }
@@ -234,14 +230,18 @@
     // Muestra error si falla la carga
     // ------------------------------------------------------
     function mostrarErrorCarga(err) {
-        const contenedor = document.querySelector('#categoriasGrid');
-        if (contenedor) {
-            contenedor.innerHTML = `
-        <p class="loading" style="color: var(--color-error)">
-          ⚠️ No se pudieron cargar los datos del torneo.<br>
-          <small>${err.message}</small>
-        </p>
+        const header = document.querySelector('.site-header');
+        if (header) {
+            const aviso = document.createElement('div');
+            aviso.style.cssText = `
+        background: #c8102e;
+        color: #fff;
+        padding: .75rem 1rem;
+        text-align: center;
+        font-size: .9rem;
       `;
+            aviso.textContent = '⚠️ No se pudieron cargar los datos del torneo. Recarga la página o contacta al organizador.';
+            header.insertAdjacentElement('afterend', aviso);
         }
     }
 

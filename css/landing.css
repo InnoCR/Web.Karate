@@ -1,7 +1,7 @@
 /* =========================================================
    GUANA-CUP 2026 · landing.css
    Estilos de la Vista 0: hero, contador, info,
-   categorías y CTA final
+   categoría única y CTA final
    ========================================================= */
 
 /* ------------------------------
@@ -18,7 +18,6 @@
     border-bottom: 1px solid var(--color-border);
 }
 
-/* Capa decorativa tipo "pincelada" */
 .hero-bg {
     position: absolute;
     inset: 0;
@@ -37,7 +36,6 @@
     align-items: center;
 }
 
-/* En desktop: texto izquierda, póster derecha */
 @media (min-width: 900px) {
     .hero-inner {
         grid-template-columns: 1.1fr 0.9fr;
@@ -151,7 +149,6 @@
     min-width: 200px;
 }
 
-/* Póster */
 .hero-poster {
     position: relative;
     display: flex;
@@ -340,79 +337,55 @@
 }
 
 /* ------------------------------
-   4. CATEGORÍAS
+   4. CATEGORÍA ÚNICA (Kumite)
    ------------------------------ */
-.categorias-section {
+.categoria-unica-section {
     padding: var(--space-xl) 0;
     background: var(--color-bg-alt);
     border-top: 1px solid var(--color-border);
     border-bottom: 1px solid var(--color-border);
 }
 
-.categorias-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 1rem;
-    margin-top: var(--space-lg);
-}
-
-@media (min-width: 640px) {
-    .categorias-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
-
-@media (min-width: 960px) {
-    .categorias-grid {
-        grid-template-columns: repeat(4, 1fr);
-    }
-}
-
-.categoria-card {
-    background: var(--color-surface);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-md);
-    padding: 1.25rem;
-    display: flex;
-    flex-direction: column;
-    gap: .5rem;
+.categoria-unica-card {
+    max-width: 520px;
+    margin: var(--space-lg) auto 0;
+    background: linear-gradient(135deg, rgba(200, 16, 46, .12), rgba(212, 175, 55, .08));
+    border: 2px solid var(--color-primary);
+    border-radius: var(--radius-lg);
+    padding: 2rem 1.5rem;
+    text-align: center;
+    box-shadow: 0 12px 40px rgba(200, 16, 46, .2);
     position: relative;
-    transition: transform var(--t-fast), border-color var(--t-fast);
+    overflow: hidden;
 }
 
-.categoria-card:hover {
-    transform: translateY(-4px);
-    border-color: var(--color-gold);
+.categoria-unica-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--color-primary), var(--color-gold));
 }
 
-.categoria-bloque {
+.categoria-unica-card h3 {
     font-family: var(--font-display);
-    text-transform: uppercase;
-    letter-spacing: .15em;
-    font-size: .7rem;
-    color: var(--color-primary-light);
-}
-
-.categoria-nombre {
-    font-family: var(--font-display);
-    font-size: 1.15rem;
-    text-transform: uppercase;
+    font-size: clamp(2rem, 6vw, 2.75rem);
     color: #fff;
-    line-height: 1.2;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    margin-bottom: .25rem;
+    text-shadow: 0 4px 20px rgba(200, 16, 46, .4);
 }
 
-.categoria-desc {
-    color: var(--color-text-muted);
-    font-size: .85rem;
-    flex: 1;
-}
-
-.categoria-precio {
+.categoria-unica-card .precio {
     font-family: var(--font-display);
-    font-size: 1.35rem;
+    font-size: clamp(1.75rem, 5vw, 2.25rem);
     font-weight: 700;
     color: var(--color-gold);
-    margin-top: .25rem;
+    text-shadow: 0 2px 14px rgba(212, 175, 55, .4);
+    margin-top: .5rem;
 }
 
 /* ------------------------------

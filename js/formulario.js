@@ -1,10 +1,11 @@
 /* =========================================================
    GUANA-CUP 2026 · formulario.js
-   Lógica del formulario multi-paso
-   - Validación condicional: identificación y email opcionales
-     para menores de edad
-   - Indicadores visuales dinámicos (asteriscos y hints)
-   - Resumen que oculta filas vacías
+   Lógica del formulario multi-paso (4 pasos)
+   - Fecha de nacimiento con 3 dropdowns (día/mes/año)
+   - Identificación y correo opcionales
+   - Peso y altura obligatorios
+   - Precio fijo desde config
+   - Sin categorías
    ========================================================= */
 
 (function () {
@@ -14,12 +15,19 @@
     const $$ = (sel, ctx = document) => Array.from(ctx.querySelectorAll(sel));
 
     // ------------------------------------------------------
+    // Constantes
+    // ------------------------------------------------------
+    const MESES = [
+        'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+        'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+    ];
+
+    // ------------------------------------------------------
     // Estado del formulario
     // ------------------------------------------------------
     const state = {
         pasoActual: 1,
-        totalPasos: 5,
-        esMenor: false,
+        totalPasos: 4,
         bloqueEdad: null,
         folio: null,
         datos: null,
@@ -28,7 +36,7 @@
     };
 
     // ------------------------------------------------------
-    // Referencias a elementos clave
+    // Referencias
     // ------------------------------------------------------
     const refs = {
         form: null,
@@ -40,9 +48,6 @@
         progressSteps: []
     };
 
-    // ------------------------------------------------------
-    // Cachear referencias
-    // ------------------------------------------------------
     function cachearRefs() {
         refs.form = $('#formInscripcion');
         refs.pasos = $$('.paso');
@@ -53,21 +58,111 @@
         refs.progressSteps = $$('.progress-steps li');
     }
 
+    // ======================================================
+    // DROPDOWNS DE FECHA DE NACIMIENTO
+    // ======================================================
+
     // ------------------------------------------------------
-    // Navegación entre pasos
+    // Poblar día, mes y año con opciones
     // ------------------------------------------------------
+    function poblarFechaNacimiento() {
+        const diaSel = $('#diaNacimiento');
+        const mesSel = $('#mesNacimiento');
+        const anioSel = $('#anioNacimiento');
+        if (!diaSel || !mesSel || !anioSel) return;
+
+        // Días 1-31
+        if (diaSel.options.length <= 1) {
+            for (let i = 1; i <= 31; i++) {
+                const opt = document.createElement('option');
+                opt.value = String(i).padStart(2, '0');
+                opt.textContent = String(i);
+                diaSel.appendChild(opt);
+            }
+        }
+
+        // Meses (nombre)
+        if (mesSel.options.length <= 1) {
+            MESES.forEach((nombre, idx) => {
+                const opt = document.createElement('option');
+                opt.value = String(idx + 1).padStart(2, '0');
+                opt.textContent = nombre;
+                mesSel.appendChild(opt);
+            });
+        }
+
+        // Años: del rango del config (max → min, descendente)
+        const cfg = window.APP.config || {};
+        const rango = cfg.rangoAniosNacimiento || { min: 2008, max: 2022 };
+        if (anioSel.options.length <= 1) {
+            for (let anio = rango.max; anio >= rango.min; anio--) {
+                const opt = document.createElement('option');
+                opt.value = String(anio);
+                opt.textContent = String(anio);
+                anioSel.appendChild(opt);
+            }
+        }
+    }
+
+    // ------------------------------------------------------
+    // Ajustar días según el mes seleccionado
+    // ------------------------------------------------------
+    function ajustarDiasDelMes() {
+        const diaSel = $('#diaNacimiento');
+        const mesSel = $('#mesNacimiento');
+        const anioSel = $('#anioNacimiento');
+        if (!diaSel || !mesSel) return;
+
+        const mes = parseInt(mesSel.value, 10);
+        const anio = parseInt(anioSel?.value, 10) || 2020;
+
+        if (!mes) return;
+
+        // Días en el mes (considerando bisiestos)
+        const diasEnMes = new Date(anio, mes, 0).getDate();
+
+        // Ocultar/mostrar opciones
+        Array.from(diaSel.options).forEach(opt => {
+            if (opt.value === '') return;
+            const dia = parseInt(opt.value, 10);
+            opt.hidden = dia > diasEnMes;
+            opt.disabled = dia > diasEnMes;
+        });
+
+        // Si el día seleccionado ya no existe, resetear
+        const diaActual = parseInt(diaSel.value, 10);
+        if (diaActual > diasEnMes) {
+            diaSel.value = '';
+        }
+    }
+
+    // ------------------------------------------------------
+    // Obtener fecha de nacimiento como string ISO YYYY-MM-DD
+    // ------------------------------------------------------
+    function obtenerFechaNacimiento() {
+        const dia = $('#diaNacimiento')?.value || '';
+        const mes = $('#mesNacimiento')?.value || '';
+        const anio = $('#anioNacimiento')?.value || '';
+        if (!dia || !mes || !anio) return '';
+        return `${anio}-${mes}-${dia}`;
+    }
+
+    // ------------------------------------------------------
+    // Formatear fecha para mostrar (dd/mm/yyyy)
+    // ------------------------------------------------------
+    function formatearFechaNacimiento() {
+        const dia = $('#diaNacimiento')?.value || '';
+        const mes = $('#mesNacimiento')?.value || '';
+        const anio = $('#anioNacimiento')?.value || '';
+        if (!dia || !mes || !anio) return '';
+        return `${dia}/${mes}/${anio}`;
+    }
+
+    // ======================================================
+    // NAVEGACIÓN
+    // ======================================================
     function irAPaso(n) {
         if (n < 1 || n > state.totalPasos) return;
-
-        // Si va hacia atrás, saltar el paso 2 cuando no es menor
-        if (n < state.pasoActual && n === 2 && !state.esMenor) {
-            n = 1;
-        }
-
-        // Si va hacia adelante y el paso destino es 2 sin ser menor, saltar al 3
-        if (n > state.pasoActual && n === 2 && !state.esMenor) {
-            n = 3;
-        }
 
         // Validar paso actual antes de avanzar
         if (n > state.pasoActual) {
@@ -78,193 +173,78 @@
             }
         }
 
-        // Ocultar todos los pasos
         refs.pasos.forEach(p => p.classList.remove('activo'));
-
-        // Mostrar el solicitado
         const paso = refs.pasos.find(p => Number(p.dataset.paso) === n);
         if (paso) paso.classList.add('activo');
 
-        // Actualizar estado
         state.pasoActual = n;
 
-        // Acciones al entrar al paso
         alEntrarPaso(n);
-
-        // Actualizar barra de progreso y botones
         actualizarProgreso();
         actualizarBotones();
 
-        // Scroll al inicio del formulario
         refs.form?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
-    // ------------------------------------------------------
-    // Acciones al entrar a un paso
-    // ------------------------------------------------------
     function alEntrarPaso(n) {
         switch (n) {
             case 1:
                 recalcularEdadYBloque();
                 break;
-
             case 2:
-                // Solo llegamos aquí si es menor
+                // Nada especial
                 break;
-
             case 3:
-                window.Categorias.renderFormulario(state.bloqueEdad);
-                break;
-
-            case 4:
                 prellenarFirma();
                 break;
-
-            case 5:
+            case 4:
                 generarResumen();
                 if (!state.folio) generarFolio();
                 break;
         }
     }
 
-    // ------------------------------------------------------
-    // Recalcular edad y bloque
-    // ------------------------------------------------------
+    // ======================================================
+    // CÁLCULO DE EDAD Y BLOQUE
+    // ======================================================
     function recalcularEdadYBloque() {
-        const fechaInput = $('#fechaNacimiento');
         const edadInput = $('#edadCalculada');
-        const aviso = $('#avisoMenor');
+        const fechaNacimiento = obtenerFechaNacimiento();
 
-        if (!fechaInput || !fechaInput.value) {
+        if (!fechaNacimiento) {
             if (edadInput) edadInput.value = '';
-            if (aviso) aviso.hidden = true;
-            state.esMenor = false;
             state.bloqueEdad = null;
-            actualizarIndicadoresOpcionales();
             return;
         }
 
         const cfg = window.APP.config;
-        const fechaTorneo = cfg.fechaTorneo;
-        const edad = window.calcularEdad(fechaInput.value, fechaTorneo);
+        const edad = window.calcularEdad(fechaNacimiento, cfg.fechaTorneo);
         const bloque = window.obtenerBloqueEdad(edad);
 
         if (edadInput) edadInput.value = edad >= 0 ? `${edad} años` : '';
-
-        state.esMenor = edad < 18 && edad >= 0;
         state.bloqueEdad = bloque ? bloque.id : null;
-
-        if (aviso) aviso.hidden = !state.esMenor;
-
-        if (state.esMenor) habilitarPaso2();
-        else deshabilitarPaso2();
-
-        // Actualizar indicadores visuales de campos opcionales
-        actualizarIndicadoresOpcionales();
     }
 
-    // ------------------------------------------------------
-    // Actualizar asteriscos y hints según edad
-    // ------------------------------------------------------
-    function actualizarIndicadoresOpcionales() {
-        const esMenor = state.esMenor;
-
-        const labelId = $('#labelIdentificacionReq');
-        const labelMail = $('#labelEmailReq');
-        const hintId = $('#hintIdentificacion');
-        const hintMail = $('#hintEmail');
-
-        if (labelId) labelId.style.display = esMenor ? 'none' : '';
-        if (labelMail) labelMail.style.display = esMenor ? 'none' : '';
-        if (hintId) hintId.hidden = !esMenor;
-        if (hintMail) hintMail.hidden = !esMenor;
-
-        const inputId = $('#identificacion');
-        const inputMail = $('#email');
-        if (inputId) inputId.required = !esMenor;
-        if (inputMail) inputMail.required = !esMenor;
-
-        // Limpiar errores visuales de esos campos si se vuelven opcionales
-        if (esMenor) {
-            const campoId = inputId?.closest('.campo');
-            const campoMail = inputMail?.closest('.campo');
-            if (campoId) {
-                campoId.classList.remove('error');
-                const err = campoId.querySelector('.error-msg');
-                if (err) err.textContent = '';
-            }
-            if (campoMail) {
-                campoMail.classList.remove('error');
-                const err = campoMail.querySelector('.error-msg');
-                if (err) err.textContent = '';
-            }
-        }
-    }
-
-    // ------------------------------------------------------
-    // Habilitar / deshabilitar paso 2
-    // ------------------------------------------------------
-    function habilitarPaso2() {
-        const paso = refs.pasos.find(p => Number(p.dataset.paso) === 2);
-        if (!paso) return;
-        $$('input, select', paso).forEach(el => el.disabled = false);
-    }
-
-    function deshabilitarPaso2() {
-        const paso = refs.pasos.find(p => Number(p.dataset.paso) === 2);
-        if (!paso) return;
-        $$('input, select', paso).forEach(el => {
-            el.disabled = true;
-            const campo = el.closest('.campo');
-            if (campo) campo.classList.remove('error');
-            const err = campo?.querySelector('.error-msg');
-            if (err) err.textContent = '';
-        });
-    }
-
-    // ------------------------------------------------------
-    // Prellenar firma del Paso 4
-    // ------------------------------------------------------
+    // ======================================================
+    // PRELLENAR FIRMA
+    // ======================================================
     function prellenarFirma() {
         const firmaNombre = $('#firmaNombre');
         const firmaId = $('#firmaIdentificacion');
         const firmaParen = $('#firmaParentesco');
 
-        if (state.esMenor) {
-            const tutorNombre = $('#tutorNombre')?.value || '';
-            const tutorId = $('#tutorIdentificacion')?.value || '';
-            const tutorParen = $('#tutorParentesco')?.value || '';
-            const tutorParenOtro = $('#tutorParentescoOtro')?.value || '';
+        const tutorNombre = $('#tutorNombre')?.value || '';
+        const tutorId = $('#tutorIdentificacion')?.value || '';
+        const tutorParen = $('#tutorParentesco')?.value || '';
 
-            if (firmaNombre && !firmaNombre.value) firmaNombre.value = tutorNombre;
-            if (firmaId && !firmaId.value) firmaId.value = tutorId;
-            if (firmaParen && !firmaParen.value) {
-                firmaParen.value = tutorParen === 'otro'
-                    ? (tutorParenOtro || 'Otro')
-                    : traducirParentesco(tutorParen);
-            }
-        } else {
-            const nombre = $('#nombreCompleto')?.value || '';
-            const id = $('#identificacion')?.value || '';
-
-            if (firmaNombre && !firmaNombre.value) firmaNombre.value = nombre;
-            if (firmaId && !firmaId.value) firmaId.value = id;
-        }
+        if (firmaNombre && !firmaNombre.value) firmaNombre.value = tutorNombre;
+        if (firmaId && !firmaId.value) firmaId.value = tutorId;
+        if (firmaParen && !firmaParen.value) firmaParen.value = tutorParen;
     }
 
-    function traducirParentesco(valor) {
-        const mapa = {
-            padre: 'Padre',
-            madre: 'Madre',
-            encargado: 'Encargado legal',
-            otro: 'Otro'
-        };
-        return mapa[valor] || valor;
-    }
-
-    // ------------------------------------------------------
-    // Validaciones por paso
-    // ------------------------------------------------------
+    // ======================================================
+    // VALIDACIONES
+    // ======================================================
     function validarPaso(n) {
         const errores = [];
         const paso = refs.pasos.find(p => Number(p.dataset.paso) === n);
@@ -277,32 +257,25 @@
         switch (n) {
             case 1: return validarPaso1(paso);
             case 2: return validarPaso2(paso);
-            case 3: return validarPaso3(paso);
-            case 4: return window.Liberacion.validarPasoLiberacion();
-            case 5: return { valido: true, errores: [] };
+            case 3: return window.Liberacion.validarPasoLiberacion();
+            case 4: return { valido: true, errores: [] };
             default: return { valido: true, errores };
         }
     }
 
     function validarPaso1(paso) {
         const errores = [];
-        const esMenor = state.esMenor;
 
         // Campos obligatorios base
         const campos = [
             { id: 'nombreCompleto', msg: 'Ingresa el nombre completo' },
-            { id: 'fechaNacimiento', msg: 'Ingresa la fecha de nacimiento' },
             { id: 'sexo', msg: 'Selecciona el sexo' },
             { id: 'telefono', msg: 'Ingresa el teléfono' },
             { id: 'dojo', msg: 'Ingresa el dojo' },
-            { id: 'grado', msg: 'Selecciona el grado' }
+            { id: 'grado', msg: 'Selecciona el grado' },
+            { id: 'peso', msg: 'Ingresa el peso' },
+            { id: 'altura', msg: 'Ingresa la altura' }
         ];
-
-        // Identificación y email solo obligatorios si es adulto
-        if (!esMenor) {
-            campos.push({ id: 'identificacion', msg: 'Ingresa la identificación' });
-            campos.push({ id: 'email', msg: 'Ingresa el correo' });
-        }
 
         campos.forEach(({ id, msg }) => {
             const input = document.getElementById(id);
@@ -312,18 +285,32 @@
             }
         });
 
-        // Validar formato de email solo si tiene valor
+        // Validar fecha de nacimiento (3 dropdowns)
+        const dia = $('#diaNacimiento')?.value;
+        const mes = $('#mesNacimiento')?.value;
+        const anio = $('#anioNacimiento')?.value;
+
+        if (!dia || !mes || !anio) {
+            marcarError($('#diaNacimiento'), 'Selecciona la fecha completa');
+            errores.push('Fecha de nacimiento incompleta');
+        } else {
+            // Validar que la edad esté en rango
+            const fechaNacimiento = `${anio}-${mes}-${dia}`;
+            const cfg = window.APP.config;
+            const edad = window.calcularEdad(fechaNacimiento, cfg.fechaTorneo);
+            const bloque = window.obtenerBloqueEdad(edad);
+
+            if (!bloque) {
+                marcarError($('#diaNacimiento'), 'Edad fuera del rango del torneo');
+                errores.push('Edad fuera de rango');
+            }
+        }
+
+        // Validar correo SOLO si tiene valor
         const email = $('#email');
         if (email?.value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)) {
             marcarError(email, 'Correo inválido');
             errores.push('Correo inválido');
-        }
-
-        // Validar que la edad esté en rango
-        if (!state.bloqueEdad) {
-            const fechaInput = $('#fechaNacimiento');
-            marcarError(fechaInput, 'Edad fuera de rango del torneo (4 a 99 años)');
-            errores.push('Edad fuera de rango');
         }
 
         return { valido: errores.length === 0, errores };
@@ -331,11 +318,10 @@
 
     function validarPaso2(paso) {
         const errores = [];
-        if (!state.esMenor) return { valido: true, errores };
 
         const campos = [
             { id: 'tutorNombre', msg: 'Ingresa el nombre del tutor' },
-            { id: 'tutorParentesco', msg: 'Selecciona el parentesco' },
+            { id: 'tutorParentesco', msg: 'Ingresa el parentesco' },
             { id: 'tutorIdentificacion', msg: 'Ingresa la identificación del tutor' },
             { id: 'tutorTelefono', msg: 'Ingresa el teléfono del tutor' },
             { id: 'tutorEmail', msg: 'Ingresa el correo del tutor' }
@@ -349,43 +335,10 @@
             }
         });
 
-        const parentesco = $('#tutorParentesco');
-        if (parentesco?.value === 'otro') {
-            const otro = $('#tutorParentescoOtro');
-            if (!otro || !otro.value.trim()) {
-                marcarError(otro, 'Especifica el parentesco');
-                errores.push('Especifica el parentesco');
-            }
-        }
-
         const email = $('#tutorEmail');
         if (email?.value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)) {
             marcarError(email, 'Correo inválido');
             errores.push('Correo inválido del tutor');
-        }
-
-        return { valido: errores.length === 0, errores };
-    }
-
-    function validarPaso3(paso) {
-        const errores = [];
-        const seleccionadas = window.Categorias.obtenerSeleccionadas();
-
-        if (seleccionadas.length === 0) {
-            errores.push('Selecciona al menos una categoría');
-            let contenedorErr = $('#categoriasLista')?.parentElement?.querySelector('.error-general');
-            if (!contenedorErr) {
-                const lista = $('#categoriasLista');
-                if (lista) {
-                    const p = document.createElement('p');
-                    p.className = 'error-msg error-general';
-                    p.textContent = '⚠️ Selecciona al menos una categoría para continuar.';
-                    lista.parentElement.appendChild(p);
-                }
-            }
-        } else {
-            const errGen = $('#categoriasLista')?.parentElement?.querySelector('.error-general');
-            if (errGen) errGen.remove();
         }
 
         return { valido: errores.length === 0, errores };
@@ -411,33 +364,19 @@
         }
     }
 
-    // ------------------------------------------------------
-    // Progreso y botones
-    // ------------------------------------------------------
+    // ======================================================
+    // PROGRESO Y BOTONES
+    // ======================================================
     function actualizarProgreso() {
-        const esMenor = state.esMenor;
-        const pasosVisibles = esMenor ? [1, 2, 3, 4, 5] : [1, 3, 4, 5];
-        const totalVisibles = pasosVisibles.length;
-        const posicionActual = pasosVisibles.indexOf(state.pasoActual) + 1;
-
-        const pct = totalVisibles > 0 ? (posicionActual / totalVisibles) * 100 : 0;
+        const total = state.totalPasos;
+        const pct = (state.pasoActual / total) * 100;
         if (refs.progressFill) refs.progressFill.style.width = `${pct}%`;
 
         refs.progressSteps.forEach((li, idx) => {
             const n = idx + 1;
             li.classList.remove('active', 'done');
-
-            if (n === 2 && !esMenor) {
-                li.style.display = 'none';
-            } else {
-                li.style.display = '';
-            }
-
-            if (n === state.pasoActual) {
-                li.classList.add('active');
-            } else if (pasosVisibles.includes(n) && pasosVisibles.indexOf(n) < posicionActual - 1) {
-                li.classList.add('done');
-            }
+            if (n === state.pasoActual) li.classList.add('active');
+            else if (n < state.pasoActual) li.classList.add('done');
         });
     }
 
@@ -451,29 +390,19 @@
         }
 
         if (refs.btnSiguiente) {
-            if (esUltimo) {
-                refs.btnSiguiente.hidden = true;
-                refs.btnSiguiente.style.display = 'none';
-            } else {
-                refs.btnSiguiente.hidden = false;
-                refs.btnSiguiente.style.display = '';
-            }
+            refs.btnSiguiente.hidden = esUltimo;
+            refs.btnSiguiente.style.display = esUltimo ? 'none' : '';
         }
 
         if (refs.btnConfirmar) {
-            if (esUltimo) {
-                refs.btnConfirmar.hidden = false;
-                refs.btnConfirmar.style.display = '';
-            } else {
-                refs.btnConfirmar.hidden = true;
-                refs.btnConfirmar.style.display = 'none';
-            }
+            refs.btnConfirmar.hidden = !esUltimo;
+            refs.btnConfirmar.style.display = esUltimo ? '' : 'none';
         }
     }
 
-    // ------------------------------------------------------
-    // Generar folio
-    // ------------------------------------------------------
+    // ======================================================
+    // FOLIO
+    // ======================================================
     function generarFolio() {
         const year = new Date().getFullYear();
         const aleatorio = Math.floor(Math.random() * 9999).toString().padStart(4, '0');
@@ -481,18 +410,18 @@
         return state.folio;
     }
 
-    // ------------------------------------------------------
-    // Recolectar datos
-    // ------------------------------------------------------
+    // ======================================================
+    // RECOLECCIÓN DE DATOS
+    // ======================================================
     function recolectarDatos() {
-        const categorias = window.Categorias.obtenerSeleccionadas();
-        const total = categorias.reduce((acc, c) => acc + Number(c.precio || 0), 0);
+        const cfg = window.APP.config;
+        const fechaNacimiento = obtenerFechaNacimiento();
 
         const datos = {
             folio: state.folio,
             competidor: {
                 nombre: $('#nombreCompleto')?.value.trim() || '',
-                fechaNacimiento: $('#fechaNacimiento')?.value || '',
+                fechaNacimiento: formatearFechaNacimiento(),
                 edad: parseInt($('#edadCalculada')?.value) || 0,
                 sexo: $('#sexo')?.value || '',
                 identificacion: $('#identificacion')?.value.trim() || '',
@@ -502,42 +431,27 @@
                 sensei: $('#sensei')?.value.trim() || '',
                 grado: $('#grado')?.value || '',
                 peso: $('#peso')?.value || '',
+                altura: $('#altura')?.value || '',
                 condiciones: $('#condiciones')?.value.trim() || ''
             },
-            categorias: categorias.map(c => ({
-                id: c.id,
-                nombre: c.nombre,
-                precio: c.precio
-            })),
-            total: total,
-            liberacion: window.Liberacion.obtenerDatosLiberacion()
-        };
-
-        if (state.esMenor) {
-            let parentescoTexto = '';
-            const parentescoValor = $('#tutorParentesco')?.value || '';
-            if (parentescoValor === 'otro') {
-                parentescoTexto = $('#tutorParentescoOtro')?.value.trim() || 'Otro';
-            } else {
-                parentescoTexto = traducirParentesco(parentescoValor);
-            }
-
-            datos.tutor = {
+            tutor: {
                 nombre: $('#tutorNombre')?.value.trim() || '',
-                parentesco: parentescoTexto,
+                parentesco: $('#tutorParentesco')?.value.trim() || '',
                 identificacion: $('#tutorIdentificacion')?.value.trim() || '',
                 telefono: $('#tutorTelefono')?.value.trim() || '',
                 email: $('#tutorEmail')?.value.trim() || ''
-            };
-        }
+            },
+            total: cfg.precioInscripcion || 0,
+            liberacion: window.Liberacion.obtenerDatosLiberacion()
+        };
 
         state.datos = datos;
         return datos;
     }
 
-    // ------------------------------------------------------
-    // Generar resumen
-    // ------------------------------------------------------
+    // ======================================================
+    // RESUMEN
+    // ======================================================
     function generarResumen() {
         const contenedor = $('#resumenInscripcion');
         if (!contenedor) return;
@@ -546,42 +460,38 @@
         const cfg = window.APP.config;
         const simbolo = cfg.simboloMoneda || '₡';
 
-        // Filtrar filas vacías del competidor
+        // Filas del competidor (filtramos vacías)
         const filasCompetidor = [
             ['Nombre', datos.competidor.nombre],
-            ['Edad', `${datos.competidor.edad} años`],
+            ['Fecha de nacimiento', datos.competidor.fechaNacimiento],
+            ['Edad al torneo', `${datos.competidor.edad} años`],
             ['Identificación', datos.competidor.identificacion],
             ['Correo', datos.competidor.email],
             ['Teléfono', datos.competidor.telefono],
             ['Dojo', datos.competidor.dojo],
-            ['Grado', datos.competidor.grado]
-        ].filter(([, v]) => v && String(v).trim() !== '' && v !== '0 años');
+            ['Sensei', datos.competidor.sensei],
+            ['Grado', datos.competidor.grado],
+            ['Peso', `${datos.competidor.peso} kg`],
+            ['Altura', `${datos.competidor.altura} cm`],
+            ['Condiciones médicas', datos.competidor.condiciones]
+        ].filter(([, v]) => v && String(v).trim() !== '');
 
         const htmlCompetidor = filasCompetidor.map(
             ([k, v]) => `<div class="resumen-fila"><span>${k}</span><span>${v}</span></div>`
         ).join('');
 
-        const htmlCategorias = datos.categorias.map(c =>
-            `<li><span>${c.nombre}</span><span>${window.formatMoneda(c.precio, simbolo, cfg.locale)}</span></li>`
+        // Filas del tutor
+        const filasTutor = [
+            ['Nombre', datos.tutor.nombre],
+            ['Parentesco', datos.tutor.parentesco],
+            ['Identificación', datos.tutor.identificacion],
+            ['Teléfono', datos.tutor.telefono],
+            ['Correo', datos.tutor.email]
+        ].filter(([, v]) => v && String(v).trim() !== '');
+
+        const htmlTutor = filasTutor.map(
+            ([k, v]) => `<div class="resumen-fila"><span>${k}</span><span>${v}</span></div>`
         ).join('');
-
-        let htmlTutor = '';
-        if (datos.tutor) {
-            const filasTutor = [
-                ['Nombre', datos.tutor.nombre],
-                ['Parentesco', datos.tutor.parentesco],
-                ['Identificación', datos.tutor.identificacion],
-                ['Teléfono', datos.tutor.telefono],
-                ['Correo', datos.tutor.email]
-            ].filter(([, v]) => v && String(v).trim() !== '');
-
-            htmlTutor = `
-        <div class="resumen-bloque">
-          <h3>Tutor responsable</h3>
-          ${filasTutor.map(([k, v]) => `<div class="resumen-fila"><span>${k}</span><span>${v}</span></div>`).join('')}
-        </div>
-      `;
-        }
 
         contenedor.innerHTML = `
       <div class="resumen-bloque">
@@ -589,13 +499,9 @@
         ${htmlCompetidor}
       </div>
 
-      ${htmlTutor}
-
       <div class="resumen-bloque">
-        <h3>Categorías inscritas</h3>
-        <ul class="resumen-categorias">
-          ${htmlCategorias}
-        </ul>
+        <h3>Tutor responsable</h3>
+        ${htmlTutor}
       </div>
 
       <div class="resumen-bloque">
@@ -613,12 +519,11 @@
     `;
     }
 
-    // ------------------------------------------------------
-    // Confirmar inscripción
-    // ------------------------------------------------------
+    // ======================================================
+    // CONFIRMAR
+    // ======================================================
     function confirmar() {
         for (let i = 1; i <= state.totalPasos; i++) {
-            if (i === 2 && !state.esMenor) continue;
             const v = validarPaso(i);
             if (!v.valido) {
                 irAPaso(i);
@@ -648,30 +553,20 @@
         limpiarFormulario();
     }
 
-    // ------------------------------------------------------
-    // Limpiar el formulario (sin tocar la vista)
-    // ------------------------------------------------------
+    // ======================================================
+    // LIMPIAR
+    // ======================================================
     function limpiarFormulario() {
         refs.form?.reset();
 
         state.pasoActual = 1;
-        state.esMenor = false;
         state.bloqueEdad = null;
         state.folio = null;
 
-        window.Categorias.reset();
         window.Liberacion.reset();
 
         const edadInput = $('#edadCalculada');
         if (edadInput) edadInput.value = '';
-        const aviso = $('#avisoMenor');
-        if (aviso) aviso.hidden = true;
-
-        const parentescoOtroWrap = $('#parentescoOtroWrap');
-        if (parentescoOtroWrap) parentescoOtroWrap.hidden = true;
-
-        deshabilitarPaso2();
-        actualizarIndicadoresOpcionales();
 
         refs.pasos.forEach(p => p.classList.remove('activo'));
         const paso1 = refs.pasos.find(p => Number(p.dataset.paso) === 1);
@@ -681,9 +576,6 @@
         actualizarBotones();
     }
 
-    // ------------------------------------------------------
-    // Pintar vista de confirmación
-    // ------------------------------------------------------
     function pintarConfirmacion(datos) {
         const cfg = window.APP.config;
         const simbolo = cfg.simboloMoneda || '₡';
@@ -696,36 +588,36 @@
 
         const resumenFinal = $('#resumenFinal');
         if (resumenFinal) {
-            const resumenPaso5 = $('#resumenInscripcion');
-            if (resumenPaso5) resumenFinal.innerHTML = resumenPaso5.innerHTML;
+            const resumenPaso4 = $('#resumenInscripcion');
+            if (resumenPaso4) resumenFinal.innerHTML = resumenPaso4.innerHTML;
         }
     }
 
-    // ------------------------------------------------------
-    // Reset completo
-    // ------------------------------------------------------
     function resetCompleto() {
         limpiarFormulario();
         state.datos = null;
         state.confirmado = false;
     }
 
-    // ------------------------------------------------------
-    // Eventos
-    // ------------------------------------------------------
+    // ======================================================
+    // EVENTOS
+    // ======================================================
     function engancharEventos() {
         refs.btnSiguiente?.addEventListener('click', () => irAPaso(state.pasoActual + 1));
         refs.btnAnterior?.addEventListener('click', () => irAPaso(state.pasoActual - 1));
         refs.btnConfirmar?.addEventListener('click', confirmar);
 
-        $('#fechaNacimiento')?.addEventListener('change', recalcularEdadYBloque);
-        $('#fechaNacimiento')?.addEventListener('input', recalcularEdadYBloque);
-
-        $('#tutorParentesco')?.addEventListener('change', (e) => {
-            const wrap = $('#parentescoOtroWrap');
-            if (wrap) wrap.hidden = e.target.value !== 'otro';
+        // Fecha de nacimiento: recalcular al cambiar cualquier dropdown
+        ['#diaNacimiento', '#mesNacimiento', '#anioNacimiento'].forEach(sel => {
+            const el = $(sel);
+            if (!el) return;
+            el.addEventListener('change', () => {
+                ajustarDiasDelMes();
+                recalcularEdadYBloque();
+            });
         });
 
+        // Descargar PDF de nuevo
         $('#btnDescargarLiberacion')?.addEventListener('click', () => {
             if (!state.datos) {
                 alert('No hay datos de inscripción para descargar.');
@@ -734,6 +626,7 @@
             window.PDF.descargarPDF(state.datos);
         });
 
+        // WhatsApp
         $('#btnEnviarWhatsapp')?.addEventListener('click', () => {
             if (!state.datos) {
                 alert('No hay datos de inscripción para enviar.');
@@ -742,6 +635,7 @@
             window.WhatsApp.abrirWhatsApp(state.datos);
         });
 
+        // Contactar asesor
         $('#btnContactarAsesorHero')?.addEventListener('click', () => {
             window.WhatsApp.contactarAsesor();
         });
@@ -749,10 +643,7 @@
             window.WhatsApp.contactarAsesor();
         });
 
-        document.addEventListener('categorias:change', () => {
-            if (state.pasoActual === 5) generarResumen();
-        });
-
+        // Reset al volver al formulario tras confirmar
         document.addEventListener('vista:change', (e) => {
             if (e.detail.vista === 'formulario' && state.confirmado) {
                 resetCompleto();
@@ -760,25 +651,24 @@
         });
     }
 
-    // ------------------------------------------------------
-    // Init
-    // ------------------------------------------------------
+    // ======================================================
+    // INIT
+    // ======================================================
     function init() {
         if (state.iniciado) return;
         cachearRefs();
         if (!refs.form) return;
 
-        deshabilitarPaso2();
-        actualizarIndicadoresOpcionales();
+        poblarFechaNacimiento();
         engancharEventos();
         irAPaso(1);
         state.iniciado = true;
     }
 
+    // API pública
     window.Formulario = {
         irAPaso,
         reset: resetCompleto,
-        esMenorEdad: () => state.esMenor,
         getBloqueEdad: () => state.bloqueEdad,
         getPasoActual: () => state.pasoActual
     };

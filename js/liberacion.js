@@ -2,7 +2,7 @@
    GUANA-CUP 2026 · liberacion.js
    - Texto de la liberación de responsabilidad
    - Modal en la landing
-   - Render en el Paso 4
+   - Render en el Paso 3
    - Firma dibujada en canvas (mouse + touch)
    - Validación de aceptación
    ========================================================= */
@@ -28,10 +28,10 @@
     <h3>2. Estado físico y médico</h3>
     <p>
       Declaro encontrarme en <strong>condiciones físicas y médicas aptas</strong>
-      para la práctica del Karate Kyokushin y para participar en competencias de
-      kata y kumite. Asimismo, manifiesto no padecer ninguna condición que me
-      impida competir y me comprometo a informar al organizador cualquier
-      situación relevante.
+      para la práctica del Karate Kyokushin y para participar en la competencia
+      de <strong>kumite</strong>. Asimismo, manifiesto no padecer ninguna
+      condición que me impida competir y me comprometo a informar al organizador
+      cualquier situación relevante.
     </p>
 
     <h3>3. Conocimiento de los riesgos</h3>
@@ -68,10 +68,9 @@
 
     <h3>7. Menores de edad</h3>
     <p>
-      Si el competidor es <strong>menor de edad</strong>, el/la firmante declara
-      ser su <strong>padre, madre o encargado legal</strong>, y acepta el
-      presente documento en nombre del menor, asumiendo toda la responsabilidad
-      que corresponda.
+      El/la firmante declara ser <strong>padre, madre o encargado legal</strong>
+      del competidor menor de edad, y acepta el presente documento en su nombre,
+      asumiendo toda la responsabilidad que corresponda.
     </p>
 
     <h3>8. Aceptación</h3>
@@ -95,7 +94,7 @@
     };
 
     // ------------------------------------------------------
-    // Render del texto en el modal y en el Paso 4
+    // Render del texto en el modal y en el Paso 3
     // ------------------------------------------------------
     function renderTexto() {
         const enModal = $('#modalLiberacionBody');
@@ -139,9 +138,6 @@
     // FIRMA EN CANVAS
     // ======================================================
 
-    // ------------------------------------------------------
-    // Configura el contexto del canvas con escala correcta
-    // ------------------------------------------------------
     function configurarContexto() {
         const canvas = firma.canvas;
         if (!canvas) return;
@@ -155,7 +151,7 @@
         canvas.height = firma.altoCSS * dpr;
 
         firma.ctx = canvas.getContext('2d');
-        firma.ctx.setTransform(1, 0, 0, 1, 0, 0);  // reset transform
+        firma.ctx.setTransform(1, 0, 0, 1, 0, 0);
         firma.ctx.scale(dpr, dpr);
 
         firma.ctx.lineWidth = 2.5;
@@ -164,9 +160,6 @@
         firma.ctx.strokeStyle = '#0a0a0a';
     }
 
-    // ------------------------------------------------------
-    // Inicializa el canvas de firma
-    // ------------------------------------------------------
     function initFirmaCanvas() {
         const canvas = $('#firmaCanvas');
         if (!canvas) return;
@@ -174,14 +167,12 @@
         firma.canvas = canvas;
         configurarContexto();
 
-        // Eventos pointer (mouse + touch + stylus)
         canvas.addEventListener('pointerdown', iniciarTrazo);
         canvas.addEventListener('pointermove', trazar);
         canvas.addEventListener('pointerup', finalizarTrazo);
         canvas.addEventListener('pointercancel', finalizarTrazo);
         canvas.addEventListener('pointerleave', finalizarTrazo);
 
-        // Botón limpiar
         const btnLimpiar = $('#btnLimpiarFirma');
         if (btnLimpiar) {
             btnLimpiar.addEventListener('click', (e) => {
@@ -190,7 +181,6 @@
             });
         }
 
-        // Redimensionar con debounce
         let resizeTimer = null;
         window.addEventListener('resize', () => {
             clearTimeout(resizeTimer);
@@ -198,39 +188,23 @@
         });
     }
 
-    // ------------------------------------------------------
-    // Redimensionar canvas conservando el trazo
-    // ------------------------------------------------------
     function redimensionarCanvas() {
         const canvas = firma.canvas;
         if (!canvas) return;
 
-        // Guardar trazo actual como imagen
         const dataGuardada = firma.dibujada ? canvas.toDataURL() : null;
 
-        // Reconfigurar con nuevas dimensiones
         configurarContexto();
 
-        // Restaurar trazo si existía
         if (dataGuardada) {
             const img = new Image();
             img.onload = () => {
-                firma.ctx.drawImage(
-                    img,
-                    0, 0,
-                    firma.anchoCSS,
-                    firma.altoCSS
-                );
+                firma.ctx.drawImage(img, 0, 0, firma.anchoCSS, firma.altoCSS);
             };
             img.src = dataGuardada;
         }
     }
 
-    // ------------------------------------------------------
-    // Obtener posición del puntero relativa al canvas
-    // Usamos offsetX/offsetY porque ya tienen en cuenta
-    // la relación entre resolución interna y tamaño CSS.
-    // ------------------------------------------------------
     function getPos(e) {
         return {
             x: e.offsetX,
@@ -238,20 +212,13 @@
         };
     }
 
-    // ------------------------------------------------------
-    // Handlers del trazo
-    // ------------------------------------------------------
     function iniciarTrazo(e) {
         e.preventDefault();
         firma.canvas.setPointerCapture(e.pointerId);
         firma.dibujando = true;
         firma.dibujada = true;
-
-        // Guardar el punto de inicio pero NO pintar nada todavía.
-        // Esto evita el "punto desfasado".
         firma.ultimoPunto = getPos(e);
 
-        // Limpiar error visual si existía
         const wrap = $('#firmaWrap');
         if (wrap) wrap.classList.remove('error');
         const err = $('#firmaError');
@@ -263,12 +230,10 @@
         e.preventDefault();
 
         const pos = getPos(e);
-
         firma.ctx.beginPath();
         firma.ctx.moveTo(firma.ultimoPunto.x, firma.ultimoPunto.y);
         firma.ctx.lineTo(pos.x, pos.y);
         firma.ctx.stroke();
-
         firma.ultimoPunto = pos;
     }
 
@@ -278,9 +243,6 @@
         firma.ultimoPunto = null;
     }
 
-    // ------------------------------------------------------
-    // Limpiar firma
-    // ------------------------------------------------------
     function limpiarFirma() {
         if (!firma.canvas || !firma.ctx) return;
         firma.ctx.clearRect(0, 0, firma.canvas.width, firma.canvas.height);
@@ -292,23 +254,17 @@
         if (err) err.textContent = '';
     }
 
-    // ------------------------------------------------------
-    // ¿Hay firma dibujada?
-    // ------------------------------------------------------
     function firmaEstaFirmada() {
         return firma.dibujada;
     }
 
-    // ------------------------------------------------------
-    // Exportar la firma como PNG base64
-    // ------------------------------------------------------
     function obtenerFirmaDataURL() {
         if (!firma.canvas || !firma.dibujada) return null;
         return firma.canvas.toDataURL('image/png');
     }
 
     // ======================================================
-    // VALIDACIÓN DEL PASO 4
+    // VALIDACIÓN DEL PASO 3 (LIBERACIÓN)
     // ======================================================
     function validarPasoLiberacion() {
         const errores = [];
@@ -332,15 +288,14 @@
             limpiarError(identificacion);
         }
 
-        const esMenor = window.Formulario?.esMenorEdad?.() ?? false;
-        if (esMenor && (!parentesco || !parentesco.value.trim())) {
+        // Todos son menores, así que parentesco siempre es obligatorio
+        if (!parentesco || !parentesco.value.trim()) {
             errores.push('Indica el parentesco del tutor responsable.');
             marcarError(parentesco, 'Parentesco requerido');
-        } else if (parentesco) {
+        } else {
             limpiarError(parentesco);
         }
 
-        // Validar firma dibujada
         if (!firmaEstaFirmada()) {
             errores.push('Debes dibujar tu firma en el recuadro.');
             const wrap = $('#firmaWrap');
@@ -354,7 +309,6 @@
             if (err) err.textContent = '';
         }
 
-        // Validar check
         if (!acepto || !acepto.checked) {
             errores.push('Debes aceptar la liberación de responsabilidad.');
             const wrap = acepto?.closest('.campo-check');
@@ -391,7 +345,7 @@
     }
 
     // ------------------------------------------------------
-    // Devuelve los datos de la liberación (para PDF y resumen)
+    // Devuelve los datos de la liberación
     // ------------------------------------------------------
     function obtenerDatosLiberacion() {
         return {
@@ -406,7 +360,7 @@
     }
 
     // ------------------------------------------------------
-    // Reset del paso 4
+    // Reset del paso 3
     // ------------------------------------------------------
     function reset() {
         const ids = ['firmaNombre', 'firmaIdentificacion', 'firmaParentesco', 'aceptoLiberacion'];

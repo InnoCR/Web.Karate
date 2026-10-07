@@ -1,7 +1,7 @@
 /* =========================================================
    GUANA-CUP 2026 · formulario.css
    Estilos del formulario multi-paso: progreso, campos,
-   categorías seleccionables, liberación y resumen
+   fecha con dropdowns, liberación y resumen
    ========================================================= */
 
 /* ------------------------------
@@ -309,139 +309,26 @@
 }
 
 /* ------------------------------
-   5. CATEGORÍAS SELECCIONABLES
+   5. FECHA DE NACIMIENTO (3 dropdowns)
    ------------------------------ */
-.categorias-lista {
+.fecha-nacimiento {
     display: grid;
-    grid-template-columns: 1fr;
-    gap: .75rem;
-    margin-bottom: var(--space-md);
+    grid-template-columns: 1fr 2fr 1.2fr;
+    gap: .5rem;
 }
 
-@media (min-width: 640px) {
-    .categorias-lista {
-        grid-template-columns: 1fr 1fr;
+@media (max-width: 480px) {
+    .fecha-nacimiento {
+        grid-template-columns: 1fr 1.5fr 1fr;
+        gap: .35rem;
     }
 }
 
-.categoria-option {
-    position: relative;
-    display: flex;
-    align-items: flex-start;
-    gap: .85rem;
-    padding: 1rem;
-    background: var(--color-surface);
-    border: 1.5px solid var(--color-border);
-    border-radius: var(--radius-md);
-    cursor: pointer;
-    transition: all var(--t-fast);
-    user-select: none;
-}
-
-.categoria-option:hover {
-    border-color: var(--color-gold);
-}
-
-.categoria-option input[type="checkbox"] {
-    position: absolute;
-    opacity: 0;
-    pointer-events: none;
-}
-
-.categoria-option .check-box {
-    width: 22px;
-    height: 22px;
-    border: 2px solid var(--color-border);
-    border-radius: 5px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    margin-top: .15rem;
-    transition: all var(--t-fast);
-    background: var(--color-bg-alt);
-}
-
-.categoria-option .check-box::after {
-    content: "";
-    width: 10px;
-    height: 6px;
-    border-left: 2px solid #fff;
-    border-bottom: 2px solid #fff;
-    transform: rotate(-45deg) scale(0);
-    transition: transform var(--t-fast);
-    margin-top: -2px;
-}
-
-.categoria-option input[type="checkbox"]:checked~.check-box {
-    background: var(--color-primary);
-    border-color: var(--color-primary);
-}
-
-.categoria-option input[type="checkbox"]:checked~.check-box::after {
-    transform: rotate(-45deg) scale(1);
-}
-
-.categoria-option.selected {
-    border-color: var(--color-primary);
-    background: linear-gradient(180deg, rgba(200, 16, 46, .08), transparent);
-    box-shadow: 0 0 0 3px rgba(200, 16, 46, .12);
-}
-
-.categoria-option-info {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: .2rem;
-}
-
-.categoria-option-info .nombre {
-    font-family: var(--font-display);
-    text-transform: uppercase;
-    font-size: .98rem;
-    color: #fff;
-    letter-spacing: .04em;
-}
-
-.categoria-option-info .desc {
-    font-size: .8rem;
-    color: var(--color-text-muted);
-}
-
-.categoria-option-info .precio {
-    font-family: var(--font-display);
-    font-weight: 700;
-    font-size: 1rem;
-    color: var(--color-gold);
-    margin-top: .35rem;
-}
-
-/* Total */
-.total-box {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 1rem 1.25rem;
-    background: linear-gradient(135deg, rgba(200, 16, 46, .12), rgba(212, 175, 55, .08));
-    border: 1.5px solid var(--color-primary);
-    border-radius: var(--radius-md);
-    margin-top: var(--space-md);
-}
-
-.total-box span {
-    font-family: var(--font-display);
-    text-transform: uppercase;
-    letter-spacing: .08em;
+.fecha-nacimiento select {
+    padding: .7rem .5rem;
+    padding-right: 1.75rem;
+    background-position: right .5rem center;
     font-size: .9rem;
-    color: var(--color-text-muted);
-}
-
-.total-box strong {
-    font-family: var(--font-display);
-    font-size: 1.6rem;
-    font-weight: 700;
-    color: var(--color-gold);
-    text-shadow: 0 2px 12px rgba(212, 175, 55, .35);
 }
 
 /* ------------------------------
@@ -491,7 +378,7 @@
 }
 
 /* ------------------------------
-   7. RESUMEN (PASO 5)
+   7. RESUMEN (PASO 4)
    ------------------------------ */
 .resumen {
     display: flex;
@@ -539,29 +426,6 @@
     color: #fff;
     text-align: right;
     font-weight: 500;
-}
-
-.resumen-categorias {
-    display: flex;
-    flex-direction: column;
-    gap: .35rem;
-}
-
-.resumen-categorias li {
-    display: flex;
-    justify-content: space-between;
-    font-size: .9rem;
-    padding: .35rem 0;
-    border-bottom: 1px dashed rgba(255, 255, 255, .05);
-}
-
-.resumen-categorias li:last-child {
-    border-bottom: none;
-}
-
-.resumen-categorias li span:last-child {
-    color: var(--color-gold);
-    font-family: var(--font-display);
 }
 
 .resumen-total {

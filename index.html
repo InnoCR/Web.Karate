@@ -37,7 +37,7 @@
             </a>
             <nav class="site-nav">
                 <a href="#info" class="nav-link">Info</a>
-                <a href="#categorias" class="nav-link">Categorías</a>
+                <a href="#categoria" class="nav-link">Categoría</a>
                 <button class="btn btn-primary btn-sm" data-nav="formulario" id="navInscribirme">
                     Inscribirme
                 </button>
@@ -157,15 +157,15 @@
             </div>
         </section>
 
-        <!-- CATEGORÍAS -->
-        <section class="categorias-section" id="categorias">
+        <!-- CATEGORÍA ÚNICA -->
+        <section class="categoria-unica-section" id="categoria">
             <div class="container">
-                <h2 class="section-title">Categorías y precios</h2>
-                <p class="section-sub">Las categorías se cargan automáticamente. El total se calcula en el formulario.
-                </p>
+                <h2 class="section-title">Categoría del torneo</h2>
+                <p class="section-sub">Todos los competidores participan en la misma categoría.</p>
 
-                <div class="categorias-grid" id="categoriasGrid">
-                    <p class="loading">Cargando categorías…</p>
+                <div class="categoria-unica-card">
+                    <h3 id="infoCategoria">Kumite</h3>
+                    <p class="precio" id="infoPrecio">₡15.000</p>
                 </div>
             </div>
         </section>
@@ -195,17 +195,16 @@
                 <p>Guana-Cup 2026 · 05 de diciembre</p>
             </header>
 
-            <!-- Barra de progreso -->
+            <!-- Barra de progreso (4 pasos) -->
             <div class="progress-wrap" aria-label="Progreso de inscripción">
                 <div class="progress-bar">
-                    <div class="progress-fill" id="progressFill" style="width: 20%"></div>
+                    <div class="progress-fill" id="progressFill" style="width: 25%"></div>
                 </div>
                 <ol class="progress-steps">
                     <li class="step active" data-step="1"><span>1</span> Competidor</li>
                     <li class="step" data-step="2"><span>2</span> Tutor</li>
-                    <li class="step" data-step="3"><span>3</span> Categorías</li>
-                    <li class="step" data-step="4"><span>4</span> Liberación</li>
-                    <li class="step" data-step="5"><span>5</span> Resumen</li>
+                    <li class="step" data-step="3"><span>3</span> Liberación</li>
+                    <li class="step" data-step="4"><span>4</span> Resumen</li>
                 </ol>
             </div>
 
@@ -217,24 +216,34 @@
 
                     <div class="campo">
                         <label for="nombreCompleto">Nombre completo *</label>
-                        <input type="text" id="nombreCompleto" name="nombreCompleto" required />
+                        <input type="text" id="nombreCompleto" name="nombreCompleto"
+                            placeholder="Ej: Juan Pérez Rodríguez" required />
                         <small class="error-msg"></small>
                     </div>
 
-                    <div class="campo-row">
-                        <div class="campo">
-                            <label for="fechaNacimiento">Fecha de nacimiento *</label>
-                            <input type="date" id="fechaNacimiento" name="fechaNacimiento" required />
-                            <small class="error-msg"></small>
+                    <div class="campo">
+                        <label>Fecha de nacimiento *</label>
+                        <div class="fecha-nacimiento">
+                            <select id="diaNacimiento" name="diaNacimiento" required>
+                                <option value="">Día</option>
+                            </select>
+                            <select id="mesNacimiento" name="mesNacimiento" required>
+                                <option value="">Mes</option>
+                            </select>
+                            <select id="anioNacimiento" name="anioNacimiento" required>
+                                <option value="">Año</option>
+                            </select>
                         </div>
+                        <small class="error-msg"></small>
+                        <small class="hint">Selecciona día, mes y año</small>
+                    </div>
+
+                    <div class="campo-row">
                         <div class="campo">
                             <label>Edad al torneo</label>
                             <input type="text" id="edadCalculada" name="edadCalculada" readonly />
                             <small class="hint">Se calcula automáticamente al 05/12/2026</small>
                         </div>
-                    </div>
-
-                    <div class="campo-row">
                         <div class="campo">
                             <label for="sexo">Sexo *</label>
                             <select id="sexo" name="sexo" required>
@@ -244,45 +253,43 @@
                             </select>
                             <small class="error-msg"></small>
                         </div>
+                    </div>
+
+                    <div class="campo-row">
                         <div class="campo">
                             <label for="identificacion">
-                                Identificación <span id="labelIdentificacionReq">*</span>
+                                Identificación <span class="hint-inline">(opcional)</span>
                             </label>
-                            <input type="text" id="identificacion" name="identificacion" required />
+                            <input type="text" id="identificacion" name="identificacion" placeholder="Ej: 123456789" />
                             <small class="error-msg"></small>
-                            <small class="hint" id="hintIdentificacion" hidden>Opcional para menores de edad</small>
+                        </div>
+                        <div class="campo">
+                            <label for="telefono">Teléfono *</label>
+                            <input type="tel" id="telefono" name="telefono" placeholder="Ej: 8888-8888" required />
+                            <small class="error-msg"></small>
                         </div>
                     </div>
 
                     <div class="campo-row">
                         <div class="campo">
                             <label for="email">
-                                Correo electrónico <span id="labelEmailReq">*</span>
+                                Correo electrónico <span class="hint-inline">(opcional)</span>
                             </label>
-                            <input type="email" id="email" name="email" required />
-                            <small class="error-msg"></small>
-                            <small class="hint" id="hintEmail" hidden>Opcional para menores de edad</small>
-                        </div>
-                        <div class="campo">
-                            <label for="telefono">Teléfono *</label>
-                            <input type="tel" id="telefono" name="telefono" required />
+                            <input type="email" id="email" name="email" placeholder="Ej: correo@ejemplo.com" />
                             <small class="error-msg"></small>
                         </div>
-                    </div>
-
-                    <div class="campo-row">
                         <div class="campo">
                             <label for="dojo">Dojo / Academia *</label>
-                            <input type="text" id="dojo" name="dojo" required />
+                            <input type="text" id="dojo" name="dojo" placeholder="Ej: Oyama Ryu" required />
                             <small class="error-msg"></small>
-                        </div>
-                        <div class="campo">
-                            <label for="sensei">Sensei / Instructor</label>
-                            <input type="text" id="sensei" name="sensei" />
                         </div>
                     </div>
 
                     <div class="campo-row">
+                        <div class="campo">
+                            <label for="sensei">Sensei / Instructor</label>
+                            <input type="text" id="sensei" name="sensei" placeholder="Ej: Sensei Carlos" />
+                        </div>
                         <div class="campo">
                             <label for="grado">Grado (cinturón) *</label>
                             <select id="grado" name="grado" required>
@@ -297,90 +304,76 @@
                             </select>
                             <small class="error-msg"></small>
                         </div>
+                    </div>
+
+                    <div class="campo-row">
                         <div class="campo">
-                            <label for="peso">Peso (kg)</label>
-                            <input type="number" id="peso" name="peso" min="20" max="200" step="0.1" />
+                            <label for="peso">Peso (kg) *</label>
+                            <input type="number" id="peso" name="peso" placeholder="Ej: 55" step="0.1" required />
+                            <small class="error-msg"></small>
+                        </div>
+                        <div class="campo">
+                            <label for="altura">Altura (cm) *</label>
+                            <input type="number" id="altura" name="altura" placeholder="Ej: 170" step="1" required />
+                            <small class="error-msg"></small>
                         </div>
                     </div>
 
                     <div class="campo">
                         <label for="condiciones">Condiciones médicas o alergias (opcional)</label>
-                        <textarea id="condiciones" name="condiciones" rows="2"></textarea>
+                        <textarea id="condiciones" name="condiciones" rows="2"
+                            placeholder="Ej: Asma, alergia a algún medicamento…"></textarea>
                     </div>
 
-                    <div class="aviso-menor" id="avisoMenor" hidden>
-                        ⚠️ El competidor es <strong>menor de edad</strong>. Se solicitarán los datos del tutor
-                        responsable.
+                    <div class="aviso-menor" id="avisoMenor">
+                        ⚠️ Todos los competidores son menores de edad, se solicitarán los datos del tutor responsable.
                     </div>
                 </fieldset>
 
                 <!-- PASO 2: DATOS DEL TUTOR -->
                 <fieldset class="paso" data-paso="2" id="pasoTutor">
                     <legend>Datos del tutor responsable</legend>
-                    <p class="paso-desc">Obligatorio para competidores menores de 18 años al día del torneo.</p>
+                    <p class="paso-desc">Obligatorio para todos los competidores menores de 18 años.</p>
 
                     <div class="campo">
                         <label for="tutorNombre">Nombre completo del tutor *</label>
-                        <input type="text" id="tutorNombre" name="tutorNombre" />
+                        <input type="text" id="tutorNombre" name="tutorNombre"
+                            placeholder="Ej: María Rodríguez Solís" />
                         <small class="error-msg"></small>
                     </div>
 
                     <div class="campo-row">
                         <div class="campo">
                             <label for="tutorParentesco">Parentesco *</label>
-                            <select id="tutorParentesco" name="tutorParentesco">
-                                <option value="">Seleccione…</option>
-                                <option value="padre">Padre</option>
-                                <option value="madre">Madre</option>
-                                <option value="encargado">Encargado legal</option>
-                                <option value="otro">Otro</option>
-                            </select>
+                            <input type="text" id="tutorParentesco" name="tutorParentesco"
+                                placeholder="Ej: Madre, Padre, Encargado legal" />
                             <small class="error-msg"></small>
                         </div>
                         <div class="campo">
                             <label for="tutorIdentificacion">Identificación del tutor *</label>
-                            <input type="text" id="tutorIdentificacion" name="tutorIdentificacion" />
+                            <input type="text" id="tutorIdentificacion" name="tutorIdentificacion"
+                                placeholder="Ej: 123456789" />
                             <small class="error-msg"></small>
                         </div>
-                    </div>
-
-                    <div class="campo" id="parentescoOtroWrap" hidden>
-                        <label for="tutorParentescoOtro">Especifique el parentesco *</label>
-                        <input type="text" id="tutorParentescoOtro" name="tutorParentescoOtro" />
-                        <small class="error-msg"></small>
                     </div>
 
                     <div class="campo-row">
                         <div class="campo">
                             <label for="tutorTelefono">Teléfono del tutor *</label>
-                            <input type="tel" id="tutorTelefono" name="tutorTelefono" />
+                            <input type="tel" id="tutorTelefono" name="tutorTelefono" placeholder="Ej: 8888-8888" />
                             <small class="error-msg"></small>
                         </div>
                         <div class="campo">
                             <label for="tutorEmail">Correo del tutor *</label>
-                            <input type="email" id="tutorEmail" name="tutorEmail" />
+                            <input type="email" id="tutorEmail" name="tutorEmail"
+                                placeholder="Ej: correo@ejemplo.com" />
                             <small class="error-msg"></small>
                         </div>
                     </div>
                 </fieldset>
 
-                <!-- PASO 3: CATEGORÍAS -->
+                <!-- PASO 3: LIBERACIÓN DE RESPONSABILIDAD -->
                 <fieldset class="paso" data-paso="3">
-                    <legend>Selección de categorías</legend>
-                    <p class="paso-desc">Elige una o varias categorías. Puedes competir en Kata y Kumite.</p>
-
-                    <div class="categorias-lista" id="categoriasLista">
-                        <!-- Se genera por JS -->
-                    </div>
-
-                    <div class="total-box">
-                        <span>Total a pagar:</span>
-                        <strong id="totalPagar">₡0</strong>
-                    </div>
-                </fieldset>
-
-                <!-- PASO 4: LIBERACIÓN DE RESPONSABILIDAD -->
-                <fieldset class="paso" data-paso="4">
                     <legend>Liberación de responsabilidad</legend>
                     <p class="paso-desc">
                         Lee el texto completo, completa los datos, dibuja tu firma y acepta para continuar.
@@ -392,19 +385,23 @@
 
                     <div class="campo">
                         <label for="firmaNombre">Nombre completo de quien firma *</label>
-                        <input type="text" id="firmaNombre" name="firmaNombre" required />
+                        <input type="text" id="firmaNombre" name="firmaNombre" placeholder="Ej: María Rodríguez Solís"
+                            required />
                         <small class="error-msg"></small>
                     </div>
 
                     <div class="campo-row">
                         <div class="campo">
                             <label for="firmaIdentificacion">Identificación de quien firma *</label>
-                            <input type="text" id="firmaIdentificacion" name="firmaIdentificacion" required />
+                            <input type="text" id="firmaIdentificacion" name="firmaIdentificacion"
+                                placeholder="Ej: 123456789" required />
                             <small class="error-msg"></small>
                         </div>
                         <div class="campo">
-                            <label for="firmaParentesco">Parentesco (si aplica)</label>
-                            <input type="text" id="firmaParentesco" name="firmaParentesco" />
+                            <label for="firmaParentesco">Parentesco *</label>
+                            <input type="text" id="firmaParentesco" name="firmaParentesco"
+                                placeholder="Ej: Madre, Padre, Encargado legal" />
+                            <small class="error-msg"></small>
                         </div>
                     </div>
 
@@ -429,8 +426,8 @@
                     </div>
                 </fieldset>
 
-                <!-- PASO 5: RESUMEN -->
-                <fieldset class="paso" data-paso="5">
+                <!-- PASO 4: RESUMEN -->
+                <fieldset class="paso" data-paso="4">
                     <legend>Resumen de la inscripción</legend>
                     <div class="resumen" id="resumenInscripcion">
                         <!-- Se genera por JS -->
@@ -475,7 +472,7 @@
 
             <div class="total-final">
                 <span>Total a pagar:</span>
-                <strong id="totalFinal">₡0</strong>
+                <strong id="totalFinal">₡15.000</strong>
             </div>
 
             <div class="sinpe-box">
@@ -539,11 +536,10 @@
     <!-- Librerías -->
     <script src="libs/jspdf.umd.min.js"></script>
 
-    <!-- Scripts del sitio -->
+    <!-- Scripts del sitio (orden importa) -->
     <script src="js/config.js"></script>
     <script src="js/contador.js"></script>
     <script src="js/navegacion.js"></script>
-    <script src="js/categorias.js"></script>
     <script src="js/liberacion.js"></script>
     <script src="js/pdf.js"></script>
     <script src="js/whatsapp.js"></script>

@@ -34,10 +34,7 @@
     function generarMensaje(datos) {
         const cfg = window.APP.config || {};
         const simbolo = cfg.simboloMoneda || '₡';
-
-        const listaCategorias = datos.categorias
-            .map(c => `  • ${c.nombre} — ${window.formatMoneda(c.precio, simbolo, cfg.locale)}`)
-            .join('\n');
+        const precio = cfg.precioInscripcion || 0;
 
         const bloqueTutor = datos.tutor && datos.tutor.nombre
             ? `*Tutor responsable:* ${datos.tutor.nombre} (${datos.tutor.parentesco})`
@@ -54,12 +51,12 @@
             `*Edad:* ${datos.competidor.edad} años`,
             `*Dojo:* ${datos.competidor.dojo}`,
             `*Grado:* ${datos.competidor.grado}`,
+            `*Peso:* ${datos.competidor.peso} kg`,
+            `*Altura:* ${datos.competidor.altura} cm`,
             bloqueTutor,
             '',
-            '*Categorías inscritas:*',
-            listaCategorias,
-            '',
-            `*Total a pagar:* ${window.formatMoneda(datos.total, simbolo, cfg.locale)}`,
+            `*Categoría:* ${cfg.categoriaUnica || 'Kumite'}`,
+            `*Total a pagar:* ${window.formatMoneda(precio, simbolo, cfg.locale)}`,
             '',
             '*Datos para SINPE Móvil:*',
             `Número: ${cfg.sinpe?.numero || '—'}`,

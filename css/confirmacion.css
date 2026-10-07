@@ -132,28 +132,6 @@
     font-weight: 500;
 }
 
-.resumen-final .resumen-categorias {
-    display: flex;
-    flex-direction: column;
-}
-
-.resumen-final .resumen-categorias li {
-    display: flex;
-    justify-content: space-between;
-    font-size: .9rem;
-    padding: .3rem 0;
-    border-bottom: 1px dashed rgba(255, 255, 255, .05);
-}
-
-.resumen-final .resumen-categorias li:last-child {
-    border-bottom: none;
-}
-
-.resumen-final .resumen-categorias li span:last-child {
-    color: var(--color-gold);
-    font-family: var(--font-display);
-}
-
 /* ------------------------------
    4. TOTAL FINAL
    ------------------------------ */

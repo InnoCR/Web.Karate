@@ -1,13 +1,11 @@
 /* =========================================================
    GUANA-CUP 2026 · pdf.js
-   Genera el PDF de la liberación de responsabilidad usando
-   jsPDF. Incluye la firma dibujada en canvas como imagen.
+   Genera el PDF de la liberación de responsabilidad.
+   Sin información económica. Incluye firma dibujada.
    ========================================================= */
 
 (function () {
     'use strict';
-
-    const $ = (sel) => document.querySelector(sel);
 
     // ------------------------------------------------------
     // Quita las etiquetas HTML del texto de la liberación
@@ -43,7 +41,6 @@
         const doc = new jsPDF({ unit: 'mm', format: 'a4' });
 
         const cfg = window.APP.config || {};
-        const simbolo = cfg.simboloMoneda || '₡';
         const pageW = doc.internal.pageSize.getWidth();
         const pageH = doc.internal.pageSize.getHeight();
         const margen = 15;
@@ -96,17 +93,28 @@
         doc.setFont('helvetica', 'normal');
         doc.setFontSize(10);
 
+        // Filas del competidor (sin identificación ni correo si están vacíos)
         const filasCompetidor = [
             ['Nombre:', datos.competidor.nombre],
-            ['Identificación:', datos.competidor.identificacion],
             ['Fecha de nacimiento:', datos.competidor.fechaNacimiento],
             ['Edad al torneo:', `${datos.competidor.edad} años`],
             ['Sexo:', datos.competidor.sexo],
             ['Dojo / Academia:', datos.competidor.dojo],
             ['Grado:', datos.competidor.grado],
-            ['Correo:', datos.competidor.email],
-            ['Teléfono:', datos.competidor.telefono]
+            ['Peso:', `${datos.competidor.peso} kg`],
+            ['Altura:', `${datos.competidor.altura} cm`]
         ];
+
+        // Solo incluimos identificación y correo si tienen valor
+        if (datos.competidor.identificacion) {
+            filasCompetidor.splice(1, 0, ['Identificación:', datos.competidor.identificacion]);
+        }
+        if (datos.competidor.email) {
+            filasCompetidor.push(['Correo:', datos.competidor.email]);
+        }
+        if (datos.competidor.telefono) {
+            filasCompetidor.push(['Teléfono:', datos.competidor.telefono]);
+        }
 
         filasCompetidor.forEach(([label, valor]) => {
             doc.setFont('helvetica', 'bold');
@@ -148,52 +156,9 @@
         }
 
         // =========================================
-        // CATEGORÍAS
-        // =========================================
-        y += 3;
-        doc.setTextColor(...ROJO);
-        doc.setFont('helvetica', 'bold');
-        doc.setFontSize(11);
-        doc.text('CATEGORÍAS INSCRITAS', margen, y);
-        y += 2;
-        doc.line(margen, y, pageW - margen, y);
-        y += 6;
-
-        doc.setTextColor(...NEGRO);
-        doc.setFontSize(10);
-        datos.categorias.forEach(cat => {
-            doc.setFont('helvetica', 'normal');
-            doc.text(`• ${cat.nombre}`, margen, y);
-            doc.setFont('helvetica', 'bold');
-            doc.setTextColor(...DORADO);
-            doc.text(
-                window.formatMoneda(cat.precio, simbolo, cfg.locale),
-                pageW - margen, y,
-                { align: 'right' }
-            );
-            doc.setTextColor(...NEGRO);
-            y += 5.5;
-        });
-
-        y += 2;
-        doc.setDrawColor(...DORADO);
-        doc.setLineWidth(0.5);
-        doc.line(pageW - margen - 60, y, pageW - margen, y);
-        y += 6;
-        doc.setFont('helvetica', 'bold');
-        doc.setFontSize(11);
-        doc.text('TOTAL A PAGAR:', pageW - margen - 60, y);
-        doc.setTextColor(...ROJO);
-        doc.text(
-            window.formatMoneda(datos.total, simbolo, cfg.locale),
-            pageW - margen, y,
-            { align: 'right' }
-        );
-
-        // =========================================
         // TEXTO DE LA LIBERACIÓN
         // =========================================
-        y += 12;
+        y += 8;
         doc.setTextColor(...ROJO);
         doc.setFont('helvetica', 'bold');
         doc.setFontSize(11);
@@ -221,7 +186,6 @@
         // =========================================
         // FIRMA ELECTRÓNICA
         // =========================================
-        // Verificar que quepa el bloque completo (datos + firma + línea)
         const alturaBloqueFirma = 70;
         if (y > pageH - alturaBloqueFirma) {
             doc.addPage();
@@ -274,10 +238,9 @@
         // Imagen de la firma dibujada
         if (datos.liberacion.firmaImagen) {
             try {
-                const anchoFirma = 70;   // mm
-                const altoFirma = 25;   // mm
+                const anchoFirma = 70;
+                const altoFirma = 25;
 
-                // Verificar que quepa
                 if (y + altoFirma + 12 > pageH - margen) {
                     doc.addPage();
                     y = margen + 10;
@@ -297,13 +260,17 @@
             }
         }
 
-        // Línea de firma
+        // Línea de firma con el nombre del firmante
         doc.setDrawColor(...NEGRO);
         doc.setLineWidth(0.3);
         doc.line(margen, y, margen + 80, y);
         doc.setFontSize(8);
         doc.setTextColor(...GRIS);
-        doc.text('Firma', margen, y + 4);
+        doc.text(
+            datos.liberacion.firmaNombre || 'Firma',
+            margen,
+            y + 4
+        );
 
         // =========================================
         // PIE DE PÁGINA
