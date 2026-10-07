@@ -1,8 +1,7 @@
 /* =========================================================
    GUANA-CUP 2026 · contador.js
    Contador regresivo hasta la fecha del torneo.
-   Se detiene cuando llega a cero o cuando las inscripciones
-   están cerradas.
+   Parseo manual de la fecha para evitar desfases por zona horaria.
    ========================================================= */
 
 (function () {
@@ -10,7 +9,6 @@
 
     const $ = (sel) => document.querySelector(sel);
 
-    // Referencias a los nodos del contador
     const nodos = {
         dias: null,
         horas: null,
@@ -29,7 +27,20 @@
     }
 
     // ------------------------------------------------------
-    // Actualiza los nodos del DOM con los valores calculados
+    // Parsea "YYYY-MM-DD" como fecha LOCAL (sin desfase UTC)
+    // ------------------------------------------------------
+    function parsearFechaLocal(iso) {
+        if (!iso) return null;
+        const partes = String(iso).split('-');
+        if (partes.length !== 3) return null;
+        const anio = parseInt(partes[0], 10);
+        const mes = parseInt(partes[1], 10) - 1;  // Mes: 0-11
+        const dia = parseInt(partes[2], 10);
+        return new Date(anio, mes, dia, 0, 0, 0, 0);
+    }
+
+    // ------------------------------------------------------
+    // Pinta los valores en el DOM
     // ------------------------------------------------------
     function pintar({ dias, horas, minutos, segundos }) {
         if (nodos.dias) nodos.dias.textContent = pad(dias, 2);
@@ -60,7 +71,6 @@
     function actualizarEstado(terminado) {
         if (!nodos.estado) return;
 
-        // Si las inscripciones están cerradas por bandera o fecha límite
         if (!window.APP.inscripcionesActivas) {
             nodos.estado.textContent = '⚠️ Las inscripciones están cerradas. Contacta al organizador por WhatsApp.';
             nodos.estado.style.color = 'var(--color-warning)';
@@ -78,13 +88,18 @@
     }
 
     // ------------------------------------------------------
-    // Tick: se ejecuta cada segundo
+    // Tick cada segundo
     // ------------------------------------------------------
     function tick() {
         const cfg = window.APP.config;
         if (!cfg || !cfg.fechaTorneo) return;
 
-        const objetivo = new Date(cfg.fechaTorneo + 'T00:00:00');
+        const objetivo = parsearFechaLocal(cfg.fechaTorneo);
+        if (!objetivo) {
+            console.warn('[contador.js] Fecha inválida:', cfg.fechaTorneo);
+            return;
+        }
+
         const ahora = new Date();
         const diff = calcularDiferencia(objetivo, ahora);
 
@@ -107,7 +122,6 @@
         nodos.segundos = $('#cdSegundos');
         nodos.estado = $('#contadorEstado');
 
-        // Verificación mínima
         if (!nodos.dias || !nodos.horas || !nodos.minutos || !nodos.segundos) {
             console.warn('[contador.js] No se encontraron los nodos del contador.');
             return;
@@ -118,13 +132,9 @@
     }
 
     // ------------------------------------------------------
-    // Arranque: esperamos a que config.js haya cargado los JSON
+    // Arranque
     // ------------------------------------------------------
     document.addEventListener('app:listo', iniciar);
-
-    // Fallback por si el evento ya se disparó antes de registrar el listener
-    if (window.APP && window.APP.listo) {
-        iniciar();
-    }
+    if (window.APP && window.APP.listo) iniciar();
 
 })();

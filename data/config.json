@@ -4,34 +4,49 @@
   "organizacion": "International Budokai Union - Kyokushin",
   "logo": "assets/img/logo-ibu.png",
   "poster": "assets/img/poster.jpg",
-
   "fechaTorneo": "2026-12-05",
   "horaInicio": null,
   "fechaLimiteInscripcion": "2026-11-28T23:59:59",
   "inscripcionesAbiertas": true,
-
   "moneda": "CRC",
   "simboloMoneda": "₡",
   "locale": "es-CR",
   "precioInscripcion": 15000,
   "categoriaUnica": "Kumite",
-
   "whatsappOrganizador": "50660545660",
   "sinpe": {
     "numero": "6054-5660",
     "titular": "Claudio Medrano"
   },
-
-  "valores": ["Fuerza", "Disciplina", "Respeto", "Honor"],
-
-  "bloquesEdad": [
-    { "id": "infantil",     "nombre": "Infantil",     "min": 4,  "max": 5  },
-    { "id": "juvenil",      "nombre": "Juvenil",      "min": 6,  "max": 12 },
-    { "id": "adolescentes", "nombre": "Adolescentes", "min": 13, "max": 17 }
+  "valores": [
+    "Fuerza",
+    "Disciplina",
+    "Respeto",
+    "Honor"
   ],
-
+  "bloquesEdad": [
+    {
+      "id": "infantil",
+      "nombre": "Infantil",
+      "min": 4,
+      "max": 5
+    },
+    {
+      "id": "juvenil",
+      "nombre": "Juvenil",
+      "min": 6,
+      "max": 12
+    },
+    {
+      "id": "adolescentes",
+      "nombre": "Adolescentes",
+      "min": 13,
+      "max": 17
+    }
+  ],
   "rangoAniosNacimiento": {
     "min": 2008,
     "max": 2022
-  }
+  },
+  "endpointInscripcion": ""
 }

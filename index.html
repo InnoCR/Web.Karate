@@ -452,34 +452,31 @@
     </main>
 
     <!-- ============================================= -->
-    <!-- VISTA 2: CONFIRMACIÓN                          -->
+    <!-- VISTA 2: CONFIRMACIÓN (SIMPLIFICADA)           -->
     <!-- ============================================= -->
     <main id="vista-confirmacion" class="vista">
         <div class="container confirmacion-wrap">
 
             <div class="confirmacion-icon">✅</div>
-            <h1>¡Inscripción registrada!</h1>
+
+            <h1 id="confirmacionTitulo">¡Inscripción registrada!</h1>
             <p class="confirmacion-sub">Guarda tu folio para cualquier consulta.</p>
 
+            <!-- Folio de [Nombre] -->
             <div class="folio-box">
-                <span>Folio</span>
+                <span id="folioLabel">Folio</span>
                 <strong id="folioTexto">GC2026-0000</strong>
             </div>
 
-            <div class="resumen-final" id="resumenFinal">
-                <!-- Se genera por JS -->
-            </div>
-
-            <div class="total-final">
-                <span>Total a pagar:</span>
-                <strong id="totalFinal">₡15.000</strong>
-            </div>
-
+            <!-- SINPE con monto -->
             <div class="sinpe-box">
                 <h3>Pago por SINPE Móvil</h3>
                 <p>
                     Número: <strong id="sinpeNumero">6054-5660</strong><br />
                     Titular: <strong id="sinpeTitular">Claudio Medrano</strong>
+                </p>
+                <p class="sinpe-monto">
+                    Monto: <strong id="sinpeMonto">₡15.000</strong>
                 </p>
             </div>
 

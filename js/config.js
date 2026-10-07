@@ -7,9 +7,6 @@
 (function () {
     'use strict';
 
-    // ------------------------------------------------------
-    // Estado global del sitio
-    // ------------------------------------------------------
     window.APP = {
         config: null,
         bloquesEdad: [],
@@ -17,13 +14,12 @@
         listo: false
     };
 
-    // ------------------------------------------------------
-    // Utilidades
-    // ------------------------------------------------------
     const $ = (sel, ctx = document) => ctx.querySelector(sel);
     const $$ = (sel, ctx = document) => Array.from(ctx.querySelectorAll(sel));
 
+    // ------------------------------------------------------
     // Formatea un número como moneda costarricense
+    // ------------------------------------------------------
     function formatMoneda(monto, simbolo = '₡', locale = 'es-CR') {
         try {
             return simbolo + new Intl.NumberFormat(locale, {
@@ -36,10 +32,29 @@
     }
     window.formatMoneda = formatMoneda;
 
+    // ------------------------------------------------------
     // Formatea una fecha ISO a texto en español
+    // Corregido para evitar desfase por zona horaria (UTC vs local)
+    // ------------------------------------------------------
     function formatFechaLarga(iso) {
         if (!iso) return '';
-        const fecha = new Date(iso);
+
+        let fecha;
+
+        // Caso 1: solo fecha (YYYY-MM-DD) → parsear como local
+        if (/^\d{4}-\d{2}-\d{2}$/.test(iso)) {
+            const partes = iso.split('-');
+            fecha = new Date(
+                parseInt(partes[0], 10),
+                parseInt(partes[1], 10) - 1,
+                parseInt(partes[2], 10),
+                0, 0, 0, 0
+            );
+        } else {
+            // Caso 2: ISO completo con hora → parseo normal
+            fecha = new Date(iso);
+        }
+
         return fecha.toLocaleDateString('es-CR', {
             day: '2-digit',
             month: 'long',
@@ -48,7 +63,9 @@
     }
     window.formatFechaLarga = formatFechaLarga;
 
+    // ------------------------------------------------------
     // Calcula la edad de una persona a una fecha dada
+    // ------------------------------------------------------
     function calcularEdad(fechaNacimiento, fechaReferencia) {
         const nac = new Date(fechaNacimiento);
         const ref = new Date(fechaReferencia);
@@ -61,7 +78,9 @@
     }
     window.calcularEdad = calcularEdad;
 
+    // ------------------------------------------------------
     // Devuelve el bloque de edad según la edad
+    // ------------------------------------------------------
     function obtenerBloqueEdad(edad) {
         if (!window.APP.bloquesEdad) return null;
         return window.APP.bloquesEdad.find(
@@ -99,14 +118,11 @@
         const cfg = window.APP.config;
         if (!cfg) return;
 
-        // Título del documento
         document.title = `${cfg.torneo} | Inscripción Torneo de Karate Kyokushin`;
 
-        // Brand del header
         const brandText = $('.brand-text');
         if (brandText) brandText.textContent = cfg.torneo;
 
-        // Info del torneo
         const infoHora = $('#infoHora');
         if (infoHora) {
             infoHora.textContent = cfg.horaInicio || 'Por confirmar';
@@ -132,26 +148,25 @@
             infoWhatsapp.rel = 'noopener';
         }
 
-        // SINPE en la vista de confirmación
         const sinpeNumero = $('#sinpeNumero');
         if (sinpeNumero && cfg.sinpe) sinpeNumero.textContent = cfg.sinpe.numero;
 
         const sinpeTitular = $('#sinpeTitular');
         if (sinpeTitular && cfg.sinpe) sinpeTitular.textContent = cfg.sinpe.titular;
 
-        // Contador: fecha
+        // Fecha del torneo (contador)
         const contadorFecha = $('.contador-fecha strong');
         if (contadorFecha) {
             contadorFecha.textContent = formatFechaLarga(cfg.fechaTorneo);
         }
 
-        // CTA final: fecha límite
+        // Fecha límite (CTA final)
         const ctaFechaLimite = $('.cta-final p strong');
         if (ctaFechaLimite) {
             ctaFechaLimite.textContent = formatFechaLarga(cfg.fechaLimiteInscripcion);
         }
 
-        // Precio y categoría única en la landing
+        // Categoría y precio
         const infoPrecio = $('#infoPrecio');
         if (infoPrecio) {
             infoPrecio.textContent = formatMoneda(cfg.precioInscripcion, cfg.simboloMoneda, cfg.locale);
@@ -162,7 +177,6 @@
             infoCategoria.textContent = cfg.categoriaUnica || '';
         }
 
-        // Estado de inscripciones
         aplicarEstadoInscripciones();
     }
 
@@ -226,9 +240,6 @@
         }
     }
 
-    // ------------------------------------------------------
-    // Muestra error si falla la carga
-    // ------------------------------------------------------
     function mostrarErrorCarga(err) {
         const header = document.querySelector('.site-header');
         if (header) {

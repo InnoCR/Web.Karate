@@ -6,6 +6,7 @@
    - Peso y altura obligatorios
    - Precio fijo desde config
    - Sin categorías
+   - Envío al backend (App Script) con folio de respuesta
    ========================================================= */
 
 (function () {
@@ -61,10 +62,6 @@
     // ======================================================
     // DROPDOWNS DE FECHA DE NACIMIENTO
     // ======================================================
-
-    // ------------------------------------------------------
-    // Poblar día, mes y año con opciones
-    // ------------------------------------------------------
     function poblarFechaNacimiento() {
         const diaSel = $('#diaNacimiento');
         const mesSel = $('#mesNacimiento');
@@ -81,7 +78,7 @@
             }
         }
 
-        // Meses (nombre)
+        // Meses
         if (mesSel.options.length <= 1) {
             MESES.forEach((nombre, idx) => {
                 const opt = document.createElement('option');
@@ -91,7 +88,7 @@
             });
         }
 
-        // Años: del rango del config (max → min, descendente)
+        // Años descendente desde rangoAniosNacimiento
         const cfg = window.APP.config || {};
         const rango = cfg.rangoAniosNacimiento || { min: 2008, max: 2022 };
         if (anioSel.options.length <= 1) {
@@ -104,9 +101,6 @@
         }
     }
 
-    // ------------------------------------------------------
-    // Ajustar días según el mes seleccionado
-    // ------------------------------------------------------
     function ajustarDiasDelMes() {
         const diaSel = $('#diaNacimiento');
         const mesSel = $('#mesNacimiento');
@@ -118,10 +112,8 @@
 
         if (!mes) return;
 
-        // Días en el mes (considerando bisiestos)
         const diasEnMes = new Date(anio, mes, 0).getDate();
 
-        // Ocultar/mostrar opciones
         Array.from(diaSel.options).forEach(opt => {
             if (opt.value === '') return;
             const dia = parseInt(opt.value, 10);
@@ -129,16 +121,12 @@
             opt.disabled = dia > diasEnMes;
         });
 
-        // Si el día seleccionado ya no existe, resetear
         const diaActual = parseInt(diaSel.value, 10);
         if (diaActual > diasEnMes) {
             diaSel.value = '';
         }
     }
 
-    // ------------------------------------------------------
-    // Obtener fecha de nacimiento como string ISO YYYY-MM-DD
-    // ------------------------------------------------------
     function obtenerFechaNacimiento() {
         const dia = $('#diaNacimiento')?.value || '';
         const mes = $('#mesNacimiento')?.value || '';
@@ -147,9 +135,6 @@
         return `${anio}-${mes}-${dia}`;
     }
 
-    // ------------------------------------------------------
-    // Formatear fecha para mostrar (dd/mm/yyyy)
-    // ------------------------------------------------------
     function formatearFechaNacimiento() {
         const dia = $('#diaNacimiento')?.value || '';
         const mes = $('#mesNacimiento')?.value || '';
@@ -164,7 +149,6 @@
     function irAPaso(n) {
         if (n < 1 || n > state.totalPasos) return;
 
-        // Validar paso actual antes de avanzar
         if (n > state.pasoActual) {
             const validacion = validarPaso(state.pasoActual);
             if (!validacion.valido) {
@@ -192,14 +176,12 @@
                 recalcularEdadYBloque();
                 break;
             case 2:
-                // Nada especial
                 break;
             case 3:
                 prellenarFirma();
                 break;
             case 4:
                 generarResumen();
-                if (!state.folio) generarFolio();
                 break;
         }
     }
@@ -250,7 +232,6 @@
         const paso = refs.pasos.find(p => Number(p.dataset.paso) === n);
         if (!paso) return { valido: true, errores };
 
-        // Limpiar errores previos
         $$('.campo, .campo-check', paso).forEach(c => c.classList.remove('error'));
         $$('.error-msg', paso).forEach(e => e.textContent = '');
 
@@ -266,7 +247,6 @@
     function validarPaso1(paso) {
         const errores = [];
 
-        // Campos obligatorios base
         const campos = [
             { id: 'nombreCompleto', msg: 'Ingresa el nombre completo' },
             { id: 'sexo', msg: 'Selecciona el sexo' },
@@ -285,7 +265,7 @@
             }
         });
 
-        // Validar fecha de nacimiento (3 dropdowns)
+        // Fecha de nacimiento
         const dia = $('#diaNacimiento')?.value;
         const mes = $('#mesNacimiento')?.value;
         const anio = $('#anioNacimiento')?.value;
@@ -294,7 +274,6 @@
             marcarError($('#diaNacimiento'), 'Selecciona la fecha completa');
             errores.push('Fecha de nacimiento incompleta');
         } else {
-            // Validar que la edad esté en rango
             const fechaNacimiento = `${anio}-${mes}-${dia}`;
             const cfg = window.APP.config;
             const edad = window.calcularEdad(fechaNacimiento, cfg.fechaTorneo);
@@ -306,7 +285,7 @@
             }
         }
 
-        // Validar correo SOLO si tiene valor
+        // Correo solo si tiene valor
         const email = $('#email');
         if (email?.value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)) {
             marcarError(email, 'Correo inválido');
@@ -344,9 +323,6 @@
         return { valido: errores.length === 0, errores };
     }
 
-    // ------------------------------------------------------
-    // Helpers de error
-    // ------------------------------------------------------
     function marcarError(input, msg) {
         if (!input) return;
         const campo = input.closest('.campo') || input.closest('.campo-check');
@@ -401,13 +377,12 @@
     }
 
     // ======================================================
-    // FOLIO
+    // FOLIO LOCAL (fallback)
     // ======================================================
-    function generarFolio() {
+    function generarFolioLocal() {
         const year = new Date().getFullYear();
         const aleatorio = Math.floor(Math.random() * 9999).toString().padStart(4, '0');
-        state.folio = `GC${year}-${aleatorio}`;
-        return state.folio;
+        return `GC${year}-${aleatorio}`;
     }
 
     // ======================================================
@@ -415,10 +390,9 @@
     // ======================================================
     function recolectarDatos() {
         const cfg = window.APP.config;
-        const fechaNacimiento = obtenerFechaNacimiento();
 
         const datos = {
-            folio: state.folio,
+            folio: state.folio,  // aún no generado aquí
             competidor: {
                 nombre: $('#nombreCompleto')?.value.trim() || '',
                 fechaNacimiento: formatearFechaNacimiento(),
@@ -450,7 +424,7 @@
     }
 
     // ======================================================
-    // RESUMEN
+    // RESUMEN (PASO 4)
     // ======================================================
     function generarResumen() {
         const contenedor = $('#resumenInscripcion');
@@ -460,7 +434,6 @@
         const cfg = window.APP.config;
         const simbolo = cfg.simboloMoneda || '₡';
 
-        // Filas del competidor (filtramos vacías)
         const filasCompetidor = [
             ['Nombre', datos.competidor.nombre],
             ['Fecha de nacimiento', datos.competidor.fechaNacimiento],
@@ -480,7 +453,6 @@
             ([k, v]) => `<div class="resumen-fila"><span>${k}</span><span>${v}</span></div>`
         ).join('');
 
-        // Filas del tutor
         const filasTutor = [
             ['Nombre', datos.tutor.nombre],
             ['Parentesco', datos.tutor.parentesco],
@@ -520,9 +492,50 @@
     }
 
     // ======================================================
-    // CONFIRMAR
+    // ENVIAR AL BACKEND (App Script)
+    // ------------------------------------------------------
+    // - Si hay endpoint configurado, envía los datos
+    // - El backend devuelve { folio: "GC2026-XXXX" }
+    // - Si no hay endpoint, retorna null → usa folio local
     // ======================================================
-    function confirmar() {
+    async function enviarAlBackend(datos) {
+        const cfg = window.APP.config || {};
+        const url = cfg.endpointInscripcion;
+
+        if (!url) {
+            console.warn('[formulario.js] No hay endpoint configurado. Usando folio local.');
+            return null;
+        }
+
+        try {
+            const res = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify(datos)
+            });
+
+            if (!res.ok) {
+                throw new Error(`HTTP ${res.status}`);
+            }
+
+            const data = await res.json();
+
+            if (data && data.folio) {
+                return { folio: data.folio };
+            }
+            return null;
+
+        } catch (err) {
+            console.error('[formulario.js] Error al enviar al backend:', err);
+            return null;
+        }
+    }
+
+    // ======================================================
+    // CONFIRMAR INSCRIPCIÓN
+    // ======================================================
+    async function confirmar() {
+        // Validar todos los pasos
         for (let i = 1; i <= state.totalPasos; i++) {
             const v = validarPaso(i);
             if (!v.valido) {
@@ -533,15 +546,40 @@
         }
 
         const datos = recolectarDatos();
-        if (!datos.folio) {
-            datos.folio = generarFolio();
-            state.folio = datos.folio;
+
+        // Bloquear botón y mostrar estado
+        if (refs.btnConfirmar) {
+            refs.btnConfirmar.disabled = true;
+            refs.btnConfirmar.textContent = '⏳ Enviando…';
         }
 
+        try {
+            // Enviar al backend
+            const respuesta = await enviarAlBackend(datos);
+
+            if (respuesta && respuesta.folio) {
+                datos.folio = respuesta.folio;
+            } else {
+                // Fallback: folio local
+                datos.folio = generarFolioLocal();
+            }
+
+        } catch (err) {
+            console.error('[formulario.js] Error inesperado:', err);
+            datos.folio = generarFolioLocal();
+        } finally {
+            if (refs.btnConfirmar) {
+                refs.btnConfirmar.disabled = false;
+                refs.btnConfirmar.textContent = '✔ Confirmar inscripción';
+            }
+        }
+
+        state.folio = datos.folio;
         const datosFinales = JSON.parse(JSON.stringify(datos));
         state.datos = datosFinales;
         state.confirmado = true;
 
+        // Descargar PDF automáticamente
         try {
             window.PDF.descargarPDF(datosFinales);
         } catch (e) {
@@ -576,20 +614,28 @@
         actualizarBotones();
     }
 
+    // ======================================================
+    // PINTAR CONFIRMACIÓN (simplificada)
+    // ======================================================
     function pintarConfirmacion(datos) {
         const cfg = window.APP.config;
         const simbolo = cfg.simboloMoneda || '₡';
 
+        // Label del folio: "Folio de [Nombre]"
+        const folioLabel = $('#folioLabel');
+        if (folioLabel) {
+            const nombre = datos.competidor.nombre || 'participante';
+            folioLabel.textContent = `Folio de ${nombre}`;
+        }
+
+        // Folio
         const folioTexto = $('#folioTexto');
-        if (folioTexto) folioTexto.textContent = datos.folio;
+        if (folioTexto) folioTexto.textContent = datos.folio || '—';
 
-        const totalFinal = $('#totalFinal');
-        if (totalFinal) totalFinal.textContent = window.formatMoneda(datos.total, simbolo, cfg.locale);
-
-        const resumenFinal = $('#resumenFinal');
-        if (resumenFinal) {
-            const resumenPaso4 = $('#resumenInscripcion');
-            if (resumenPaso4) resumenFinal.innerHTML = resumenPaso4.innerHTML;
+        // Monto dentro del SINPE
+        const sinpeMonto = $('#sinpeMonto');
+        if (sinpeMonto) {
+            sinpeMonto.textContent = window.formatMoneda(datos.total, simbolo, cfg.locale);
         }
     }
 
@@ -607,7 +653,7 @@
         refs.btnAnterior?.addEventListener('click', () => irAPaso(state.pasoActual - 1));
         refs.btnConfirmar?.addEventListener('click', confirmar);
 
-        // Fecha de nacimiento: recalcular al cambiar cualquier dropdown
+        // Fecha de nacimiento
         ['#diaNacimiento', '#mesNacimiento', '#anioNacimiento'].forEach(sel => {
             const el = $(sel);
             if (!el) return;

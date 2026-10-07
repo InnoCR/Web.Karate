@@ -1,7 +1,6 @@
 /* =========================================================
    GUANA-CUP 2026 · confirmacion.css
-   Estilos de la Vista 2: éxito, folio, resumen,
-   SINPE y acciones finales
+   Estilos de la Vista 2: éxito, folio, SINPE y acciones
    ========================================================= */
 
 .confirmacion-wrap {
@@ -71,9 +70,10 @@
 .folio-box span {
     font-family: var(--font-display);
     text-transform: uppercase;
-    letter-spacing: .2em;
+    letter-spacing: .18em;
     font-size: .75rem;
     color: var(--color-text-muted);
+    text-align: center;
 }
 
 .folio-box strong {
@@ -86,85 +86,7 @@
 }
 
 /* ------------------------------
-   3. RESUMEN FINAL
-   ------------------------------ */
-.resumen-final {
-    text-align: left;
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    margin-bottom: var(--space-lg);
-}
-
-.resumen-final .resumen-bloque {
-    background: var(--color-surface);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-md);
-    padding: 1rem 1.25rem;
-}
-
-.resumen-final .resumen-bloque h3 {
-    font-family: var(--font-display);
-    text-transform: uppercase;
-    letter-spacing: .08em;
-    font-size: .85rem;
-    color: var(--color-gold);
-    margin-bottom: .6rem;
-    border-bottom: 1px solid var(--color-border);
-    padding-bottom: .4rem;
-}
-
-.resumen-final .resumen-fila {
-    display: flex;
-    justify-content: space-between;
-    gap: 1rem;
-    font-size: .9rem;
-    padding: .3rem 0;
-}
-
-.resumen-final .resumen-fila span:first-child {
-    color: var(--color-text-muted);
-}
-
-.resumen-final .resumen-fila span:last-child {
-    color: #fff;
-    text-align: right;
-    font-weight: 500;
-}
-
-/* ------------------------------
-   4. TOTAL FINAL
-   ------------------------------ */
-.total-final {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1.25rem 1.5rem;
-    background: linear-gradient(135deg, rgba(200, 16, 46, .18), rgba(212, 175, 55, .12));
-    border: 2px solid var(--color-primary);
-    border-radius: var(--radius-md);
-    margin-bottom: var(--space-lg);
-    box-shadow: 0 8px 30px rgba(200, 16, 46, .25);
-}
-
-.total-final span {
-    font-family: var(--font-display);
-    text-transform: uppercase;
-    letter-spacing: .1em;
-    font-size: .9rem;
-    color: var(--color-text-muted);
-}
-
-.total-final strong {
-    font-family: var(--font-display);
-    font-size: clamp(1.5rem, 5vw, 2rem);
-    font-weight: 700;
-    color: var(--color-gold);
-    text-shadow: 0 2px 14px rgba(212, 175, 55, .4);
-}
-
-/* ------------------------------
-   5. SINPE
+   3. SINPE
    ------------------------------ */
 .sinpe-box {
     background: var(--color-surface);
@@ -197,8 +119,19 @@
     font-size: 1.05rem;
 }
 
+.sinpe-monto {
+    margin-top: .75rem;
+    padding-top: .75rem;
+    border-top: 1px solid var(--color-border);
+}
+
+.sinpe-monto strong {
+    color: var(--color-gold);
+    font-size: 1.25rem;
+}
+
 /* ------------------------------
-   6. ACCIONES
+   4. ACCIONES
    ------------------------------ */
 .confirmacion-acciones {
     display: flex;
@@ -242,7 +175,9 @@
     transform: translateY(-2px);
 }
 
-/* Nota */
+/* ------------------------------
+   5. NOTA
+   ------------------------------ */
 .confirmacion-nota {
     font-size: .85rem;
     color: var(--color-text-muted);
@@ -259,7 +194,9 @@
     color: var(--color-warning);
 }
 
-/* Botón volver */
+/* ------------------------------
+   6. BOTÓN VOLVER
+   ------------------------------ */
 .confirmacion-wrap .btn-ghost {
     margin-top: var(--space-sm);
 }
