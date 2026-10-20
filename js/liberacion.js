@@ -1,5 +1,5 @@
 /* =========================================================
-   GUANA-CUP 2026 · liberacion.js
+   GUANA-CUP 2027 · liberacion.js
    - Texto de la liberación de responsabilidad
    - Modal en la landing
    - Render en el Paso 3
@@ -14,14 +14,14 @@
     const $$ = (sel, ctx = document) => Array.from(ctx.querySelectorAll(sel));
 
     // ------------------------------------------------------
-    // Texto de la liberación (actualizado)
+    // Texto de la liberación (actualizado 2027)
     // ------------------------------------------------------
     const TEXTO_LIBERACION = `
     <h3>1. Autorización de participación</h3>
     <p>
       Por medio de la presente autorizo <strong>voluntariamente</strong> al menor
       anteriormente indicado a participar en el <strong>Torneo de Karate
-      "Guana-Cup 2026"</strong>, organizado por la International Budokai Union —
+      "Guana-Cup 2027"</strong>, organizado por la International Budokai Union —
       Kyokushin.
     </p>
 

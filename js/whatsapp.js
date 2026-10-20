@@ -1,5 +1,5 @@
 /* =========================================================
-   GUANA-CUP 2026 · whatsapp.js
+   GUANA-CUP 2027 · whatsapp.js
    Arma el mensaje de WhatsApp y abre el chat.
    Sin emojis compuestos para evitar caracteres rotos.
    ========================================================= */
@@ -41,7 +41,7 @@
             : '';
 
         const lineas = [
-            '*Inscripción Torneo Guana-Cup 2026*',
+            '*Inscripción Torneo Guana-Cup 2027*',
             '',
             `Hola, soy *${datos.competidor.nombre}*.`,
             'Acabo de completar mi inscripción al torneo.',
@@ -113,7 +113,7 @@
 
         const mensaje = normalizarTexto(
             mensajePersonalizado ||
-            'Hola, tengo una consulta sobre el Torneo Guana-Cup 2026. ¿Me pueden ayudar?'
+            'Hola, tengo una consulta sobre el Torneo Guana-Cup 2027. ¿Me pueden ayudar?'
         );
 
         const url = `https://api.whatsapp.com/send?phone=${numero}&text=${codificarParaWA(mensaje)}`;

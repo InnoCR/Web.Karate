@@ -1,5 +1,5 @@
 /* =========================================================
-   GUANA-CUP 2026 · pdf.js
+   GUANA-CUP 2027 · pdf.js
    Genera el PDF de la liberación de responsabilidad.
    Sin información económica. Incluye firma dibujada.
    ========================================================= */
@@ -7,10 +7,6 @@
 (function () {
     'use strict';
 
-    // ------------------------------------------------------
-    // Quita las etiquetas HTML del texto de la liberación
-    // para usarlo como texto plano en el PDF
-    // ------------------------------------------------------
     function htmlATexto(html) {
         const temp = document.createElement('div');
         temp.innerHTML = html;
@@ -23,16 +19,10 @@
         return temp.textContent.replace(/\n{3,}/g, '\n\n').trim();
     }
 
-    // ------------------------------------------------------
-    // Divide un texto largo en líneas que quepan en el PDF
-    // ------------------------------------------------------
     function dividirTexto(doc, texto, anchoMax) {
         return doc.splitTextToSize(texto, anchoMax);
     }
 
-    // ------------------------------------------------------
-    // Genera el PDF y devuelve el objeto jsPDF
-    // ------------------------------------------------------
     function generarPDF(datos) {
         if (!window.jspdf || !window.jspdf.jsPDF) {
             throw new Error('jsPDF no está cargado. Revisa libs/jspdf.umd.min.js');
@@ -47,22 +37,19 @@
         const anchoUtil = pageW - margen * 2;
         let y = margen;
 
-        // ------- Colores -------
         const ROJO = [200, 16, 46];
         const NEGRO = [10, 10, 10];
         const GRIS = [90, 90, 90];
         const DORADO = [180, 140, 40];
 
-        // =========================================
         // ENCABEZADO
-        // =========================================
         doc.setFillColor(...NEGRO);
         doc.rect(0, 0, pageW, 30, 'F');
 
         doc.setTextColor(255, 255, 255);
         doc.setFont('helvetica', 'bold');
         doc.setFontSize(16);
-        doc.text('TORNEO GUANA-CUP 2026', margen, 13);
+        doc.text('TORNEO GUANA-CUP 2027', margen, 13);
 
         doc.setFontSize(10);
         doc.setFont('helvetica', 'normal');
@@ -76,9 +63,7 @@
 
         y = 40;
 
-        // =========================================
         // DATOS DEL COMPETIDOR
-        // =========================================
         doc.setTextColor(...ROJO);
         doc.setFont('helvetica', 'bold');
         doc.setFontSize(11);
@@ -93,7 +78,6 @@
         doc.setFont('helvetica', 'normal');
         doc.setFontSize(10);
 
-        // Filas del competidor (sin identificación ni correo si están vacíos)
         const filasCompetidor = [
             ['Nombre:', datos.competidor.nombre],
             ['Fecha de nacimiento:', datos.competidor.fechaNacimiento],
@@ -105,7 +89,6 @@
             ['Altura:', `${datos.competidor.altura} cm`]
         ];
 
-        // Solo incluimos identificación y correo si tienen valor
         if (datos.competidor.identificacion) {
             filasCompetidor.splice(1, 0, ['Identificación:', datos.competidor.identificacion]);
         }
@@ -124,9 +107,7 @@
             y += 5.5;
         });
 
-        // =========================================
-        // DATOS DEL TUTOR (si aplica)
-        // =========================================
+        // DATOS DEL TUTOR
         if (datos.tutor && datos.tutor.nombre) {
             y += 3;
             doc.setTextColor(...ROJO);
@@ -155,9 +136,7 @@
             });
         }
 
-        // =========================================
         // TEXTO DE LA LIBERACIÓN
-        // =========================================
         y += 8;
         doc.setTextColor(...ROJO);
         doc.setFont('helvetica', 'bold');
@@ -183,9 +162,7 @@
             y += 4.5;
         });
 
-        // =========================================
         // FIRMA ELECTRÓNICA
-        // =========================================
         const alturaBloqueFirma = 70;
         if (y > pageH - alturaBloqueFirma) {
             doc.addPage();
@@ -201,7 +178,6 @@
         doc.line(margen, y, pageW - margen, y);
         y += 8;
 
-        // Datos del firmante
         doc.setTextColor(...NEGRO);
         doc.setFontSize(10);
 
@@ -235,7 +211,6 @@
         doc.text(fechaTexto, margen + 35, y);
         y += 10;
 
-        // Imagen de la firma dibujada
         if (datos.liberacion.firmaImagen) {
             try {
                 const anchoFirma = 70;
@@ -260,7 +235,6 @@
             }
         }
 
-        // Línea de firma con el nombre del firmante
         doc.setDrawColor(...NEGRO);
         doc.setLineWidth(0.3);
         doc.line(margen, y, margen + 80, y);
@@ -272,9 +246,7 @@
             y + 4
         );
 
-        // =========================================
         // PIE DE PÁGINA
-        // =========================================
         const totalPaginas = doc.internal.getNumberOfPages();
         for (let i = 1; i <= totalPaginas; i++) {
             doc.setPage(i);
@@ -290,9 +262,6 @@
         return doc;
     }
 
-    // ------------------------------------------------------
-    // Descarga el PDF con un nombre de archivo específico
-    // ------------------------------------------------------
     function descargarPDF(datos) {
         try {
             const doc = generarPDF(datos);
@@ -306,9 +275,6 @@
         }
     }
 
-    // ------------------------------------------------------
-    // API pública
-    // ------------------------------------------------------
     window.PDF = {
         generarPDF,
         descargarPDF

@@ -1,12 +1,12 @@
 {
-  "torneo": "Guana-Cup 2026",
+  "torneo": "Guana-Cup 2027",
   "subtitulo": "¡Aquí nacen los campeones!",
   "organizacion": "International Budokai Union - Kyokushin",
   "logo": "assets/img/logo-ibu.png",
   "poster": "assets/img/poster.jpg",
-  "fechaTorneo": "2026-12-05",
+  "fechaTorneo": "2027-02-20",
   "horaInicio": null,
-  "fechaLimiteInscripcion": "2026-11-28T23:59:59",
+  "fechaLimiteInscripcion": "2027-02-19T23:59:59",
   "inscripcionesAbiertas": true,
   "moneda": "CRC",
   "simboloMoneda": "₡",
@@ -45,8 +45,8 @@
     }
   ],
   "rangoAniosNacimiento": {
-    "min": 2008,
-    "max": 2022
+    "min": 2009,
+    "max": 2023
   },
   "endpointInscripcion": "https://script.google.com/macros/s/AKfycbzb7Y2gGQFVBv3jZWRFKD_fCIiraF3uBuZRk_Qfnk9C_RHHeJXR_ifHoXyFMkiIIfvAsg/exec"
 }
