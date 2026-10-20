@@ -45,7 +45,7 @@
     }
   ],
   "rangoAniosNacimiento": {
-    "min": 2009,
+    "min": 2010,
     "max": 2023
   },
   "endpointInscripcion": "https://script.google.com/macros/s/AKfycbzb7Y2gGQFVBv3jZWRFKD_fCIiraF3uBuZRk_Qfnk9C_RHHeJXR_ifHoXyFMkiIIfvAsg/exec"
