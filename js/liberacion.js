@@ -14,33 +14,39 @@
     const $$ = (sel, ctx = document) => Array.from(ctx.querySelectorAll(sel));
 
     // ------------------------------------------------------
-    // Texto de la liberación (borrador editable)
+    // Texto de la liberación (actualizado)
     // ------------------------------------------------------
     const TEXTO_LIBERACION = `
-    <h3>1. Declaración del competidor</h3>
+    <h3>1. Autorización de participación</h3>
     <p>
-      Yo, el/la firmante, declaro que participo de forma <strong>voluntaria</strong>
-      en el <strong>Torneo Guana-Cup 2026</strong>, organizado por la
-      <strong>International Budokai Union — Kyokushin</strong>, y que he leído,
-      comprendido y aceptado el presente documento en su totalidad.
+      Por medio de la presente autorizo <strong>voluntariamente</strong> al menor
+      anteriormente indicado a participar en el <strong>Torneo de Karate
+      "Guana-Cup 2026"</strong>, organizado por la International Budokai Union —
+      Kyokushin.
     </p>
 
-    <h3>2. Estado físico y médico</h3>
+    <h3>2. Conocimiento de la naturaleza de la competencia</h3>
     <p>
-      Declaro encontrarme en <strong>condiciones físicas y médicas aptas</strong>
-      para la práctica del Karate Kyokushin y para participar en la competencia
-      de <strong>kumite</strong>. Asimismo, manifiesto no padecer ninguna
-      condición que me impida competir y me comprometo a informar al organizador
-      cualquier situación relevante.
+      Declaro que conozco la naturaleza de esta competencia y entiendo que el
+      <strong>Kumite</strong> es una modalidad de Karate Kyokushin que implica
+      <strong>contacto físico</strong> entre los participantes. Por esta razón,
+      comprendo que, aun cuando se respeten las reglas establecidas, exista
+      supervisión de árbitros y jueces y se utilicen las protecciones
+      correspondientes, <strong>pueden presentarse riesgos propios de la
+      actividad deportiva</strong>.
     </p>
 
-    <h3>3. Conocimiento de los riesgos</h3>
+    <h3>3. Riesgos inherentes</h3>
     <p>
-      Reconozco que el Karate Kyokushin es un deporte de contacto y que la
-      participación en un torneo implica <strong>riesgos inherentes</strong> de
-      lesión, incluyendo pero no limitándose a: contusiones, esguinces,
-      fracturas, lesiones musculares o articulares, y en casos excepcionales,
-      lesiones de mayor gravedad.
+      Entre estos riesgos pueden encontrarse golpes, caídas, contusiones,
+      lesiones musculares, articulares u óseas, así como otras lesiones que
+      eventualmente podrían requerir valoración o atención médica.
+    </p>
+    <p>
+      También comprendo que, aunque se adopten medidas razonables de prevención y
+      seguridad, <strong>no es posible eliminar completamente los riesgos</strong>
+      inherentes a una competencia de contacto físico y que, en circunstancias
+      excepcionales, podrían producirse lesiones de mayor gravedad.
     </p>
 
     <h3>4. Exención de responsabilidad</h3>
@@ -52,11 +58,22 @@
       o en actividades relacionadas.
     </p>
 
-    <h3>5. Autorización de atención médica</h3>
+    <h3>5. Veracidad de la información y compromisos</h3>
     <p>
-      En caso de requerirlo, <strong>autorizo</strong> al personal de primeros
-      auxilios y a los servicios médicos disponibles a brindarme la atención
-      necesaria, incluyendo traslado a un centro médico si fuera indispensable.
+      Declaro que he tenido la oportunidad de conocer las condiciones y reglas
+      generales de participación y que, teniendo conocimiento de los riesgos
+      propios de esta actividad, <strong>otorgo mi autorización</strong> para que
+      el menor participe en la competencia.
+    </p>
+    <p>
+      Asimismo, manifiesto que la <strong>información proporcionada sobre el
+      menor es verdadera</strong> y que he informado a la organización sobre
+      cualquier condición física, lesión, limitación, alergia, tratamiento médico
+      o circunstancia que pueda ser relevante para su participación.
+    </p>
+    <p>
+      Me comprometo a <strong>comunicar a la organización</strong> cualquier
+      cambio en la condición del menor que pudiera afectar su participación.
     </p>
 
     <h3>6. Uso de imagen</h3>
@@ -66,17 +83,30 @@
       difusión del evento, sin derecho a compensación económica.
     </p>
 
-    <h3>7. Menores de edad</h3>
+    <h3>7. Disciplina y facultades de la organización</h3>
     <p>
-      El/la firmante declara ser <strong>padre, madre o encargado legal</strong>
-      del competidor menor de edad, y acepta el presente documento en su nombre,
-      asumiendo toda la responsabilidad que corresponda.
+      Entiendo que el menor deberá <strong>respetar las instrucciones</strong>
+      de los árbitros, jueces, instructores y organizadores durante toda la
+      actividad. Asimismo, acepto que los responsables del torneo podrán
+      <strong>detener su participación o retirarlo de un combate</strong> cuando
+      consideren que continuar representa un riesgo para su integridad física o
+      para la de otro participante.
     </p>
 
-    <h3>8. Aceptación</h3>
+    <h3>8. Atención en caso de emergencia</h3>
     <p>
-      Declaro que he leído y comprendido los términos de esta liberación de
-      responsabilidad, y que la acepto <strong>de forma libre y voluntaria</strong>.
+      En caso de que el menor sufra una lesión, accidente, malestar o cualquier
+      situación que requiera atención durante el torneo, <strong>autorizo</strong>
+      a los responsables de la organización a solicitar asistencia médica o de
+      emergencia cuando sea necesario, procurando contactar al padre, madre o
+      representante legal a la mayor brevedad posible.
+    </p>
+
+    <h3>9. Aceptación</h3>
+    <p>
+      Declaro que he <strong>leído y comprendido completamente</strong> este
+      documento, que he podido realizar las consultas que considero necesarias
+      y que otorgo esta autorización de manera <strong>libre y voluntaria</strong>.
     </p>
   `;
 
