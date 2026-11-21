@@ -1,0 +1,29 @@
+{
+    "moneda": "CRC",
+    "categorias": [
+        {
+            "id": "pa-ligero",
+            "nombre": "Pelea Acordada — Peso Ligero",
+            "pesoMin": 0,
+            "pesoMax": 70,
+            "precio": 25000,
+            "descripcion": "Combate pactado, hasta 70 kg"
+        },
+        {
+            "id": "pa-medio",
+            "nombre": "Pelea Acordada — Peso Medio",
+            "pesoMin": 70,
+            "pesoMax": 80,
+            "precio": 25000,
+            "descripcion": "Combate pactado, 70 a 80 kg"
+        },
+        {
+            "id": "pa-pesado",
+            "nombre": "Pelea Acordada — Peso Pesado",
+            "pesoMin": 80,
+            "pesoMax": 200,
+            "precio": 25000,
+            "descripcion": "Combate pactado, más de 80 kg"
+        }
+    ]
+}

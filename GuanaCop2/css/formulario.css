@@ -1,0 +1,445 @@
+/* =========================================================
+   GUANACOP2 · formulario.css
+   Estilos del formulario de 2 pasos (competidor, resumen):
+   header, progreso, inputs, fecha 3 selects, resumen, nav
+   ========================================================= */
+
+/* ------------------------------
+   1. WRAPPER DEL FORMULARIO
+   ------------------------------ */
+.formulario-wrap {
+    padding-top: var(--space-lg);
+    padding-bottom: var(--space-xl);
+}
+
+.formulario-header {
+    text-align: center;
+    margin-bottom: var(--space-lg);
+}
+
+.formulario-header h1 {
+    color: var(--color-text);
+    margin-bottom: .35rem;
+}
+
+.formulario-header h1::after {
+    content: "";
+    display: block;
+    width: 60px;
+    height: 4px;
+    background: var(--color-gold);
+    margin: .75rem auto 0;
+    border-radius: 2px;
+}
+
+.formulario-header p {
+    color: var(--color-text-muted);
+    font-size: .95rem;
+    font-family: var(--font-display);
+    text-transform: uppercase;
+    letter-spacing: .05em;
+}
+
+/* ------------------------------
+   2. BARRA DE PROGRESO (2 pasos)
+   ------------------------------ */
+.progress-wrap {
+    margin-bottom: var(--space-lg);
+}
+
+.progress-bar {
+    width: 100%;
+    height: 6px;
+    background: var(--color-surface-2);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: .75rem;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--color-primary), var(--color-gold));
+    border-radius: 3px;
+    transition: width var(--t-med);
+}
+
+.progress-steps {
+    display: flex;
+    justify-content: space-around;
+    gap: var(--space-sm);
+}
+
+.progress-steps .step {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: .3rem;
+    font-family: var(--font-display);
+    font-size: .8rem;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    color: var(--color-text-dim);
+    text-align: center;
+    transition: color var(--t-fast);
+}
+
+.progress-steps .step span {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--color-surface-2);
+    border: 2px solid var(--color-border);
+    font-size: .9rem;
+    font-weight: 700;
+    transition: all var(--t-fast);
+}
+
+.progress-steps .step.active {
+    color: var(--color-gold);
+}
+
+.progress-steps .step.active span {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+    color: #fff;
+    box-shadow: 0 0 0 4px rgba(200, 16, 46, .15);
+}
+
+@media (min-width: 600px) {
+    .progress-steps .step {
+        flex-direction: row;
+        gap: .5rem;
+        font-size: .9rem;
+    }
+}
+
+/* ------------------------------
+   3. PASOS (FIELDSET)
+   ------------------------------ */
+.paso {
+    display: none;
+    border: none;
+    padding: 0;
+    margin: 0;
+    animation: pasoIn var(--t-med);
+}
+
+.paso.activo {
+    display: block;
+}
+
+@keyframes pasoIn {
+    from {
+        opacity: 0;
+        transform: translateX(12px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.paso legend {
+    font-family: var(--font-display);
+    font-size: 1.15rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    color: var(--color-gold);
+    margin-bottom: .5rem;
+    padding: 0;
+}
+
+.paso-desc {
+    color: var(--color-text-muted);
+    font-size: .9rem;
+    margin-bottom: var(--space-md);
+}
+
+/* ------------------------------
+   4. CAMPOS
+   ------------------------------ */
+.campo {
+    margin-bottom: var(--space-md);
+    display: flex;
+    flex-direction: column;
+    gap: .35rem;
+}
+
+.campo label {
+    font-family: var(--font-display);
+    font-size: .82rem;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    color: var(--color-text);
+    font-weight: 500;
+}
+
+.campo input,
+.campo select,
+.campo textarea {
+    width: 100%;
+    padding: .75rem .9rem;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    color: var(--color-text);
+    font-size: 1rem;
+    transition: border-color var(--t-fast), box-shadow var(--t-fast);
+}
+
+.campo input:focus,
+.campo select:focus,
+.campo textarea:focus {
+    outline: none;
+    border-color: var(--color-gold);
+    box-shadow: 0 0 0 3px rgba(212, 175, 55, .15);
+}
+
+.campo input:read-only {
+    background: var(--color-surface-2);
+    color: var(--color-text-muted);
+    cursor: not-allowed;
+}
+
+.campo input::placeholder,
+.campo textarea::placeholder {
+    color: var(--color-text-dim);
+}
+
+.campo textarea {
+    resize: vertical;
+    min-height: 64px;
+}
+
+.campo-row {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-md);
+}
+
+@media (min-width: 600px) {
+    .campo-row {
+        grid-template-columns: 1fr 1fr;
+        gap: var(--space-md) var(--space-md);
+    }
+}
+
+/* Mensajes de error / hints */
+.campo .error-msg {
+    color: var(--color-error);
+    font-size: .8rem;
+    min-height: 1em;
+    display: none;
+}
+
+.campo.invalido .error-msg {
+    display: block;
+}
+
+.campo.invalido input,
+.campo.invalido select,
+.campo.invalido textarea {
+    border-color: var(--color-error);
+    box-shadow: 0 0 0 3px rgba(255, 77, 77, .12);
+}
+
+.campo .hint {
+    color: var(--color-text-dim);
+    font-size: .78rem;
+    font-style: italic;
+}
+
+/* ------------------------------
+   5. FECHA DE NACIMIENTO · 3 SELECTS
+   ------------------------------ */
+.fecha-selects {
+    display: grid;
+    grid-template-columns: 1fr 2fr 1.2fr;
+    gap: .5rem;
+}
+
+.fecha-selects select {
+    width: 100%;
+    padding: .75rem .9rem;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    color: var(--color-text);
+    font-size: 1rem;
+    transition: border-color var(--t-fast), box-shadow var(--t-fast);
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23a8a8a8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right .75rem center;
+    background-size: 1em;
+    padding-right: 2.25rem;
+    cursor: pointer;
+}
+
+.fecha-selects select:focus {
+    outline: none;
+    border-color: var(--color-gold);
+    box-shadow: 0 0 0 3px rgba(212, 175, 55, .15);
+}
+
+.fecha-selects select:invalid,
+.fecha-selects select option[value=""] {
+    color: var(--color-text-dim);
+}
+
+/* Cuando el campo padre está inválido */
+.campo.invalido .fecha-selects select {
+    border-color: var(--color-error);
+    box-shadow: 0 0 0 3px rgba(255, 77, 77, .12);
+}
+
+/* En pantallas muy chicas, mantener 3 columnas pero más compactas */
+@media (max-width: 420px) {
+    .fecha-selects {
+        grid-template-columns: 1fr 1.4fr 1fr;
+        gap: .35rem;
+    }
+
+    .fecha-selects select {
+        padding: .65rem .5rem;
+        padding-right: 1.75rem;
+        font-size: .9rem;
+        background-position: right .4rem center;
+    }
+}
+
+/* ------------------------------
+   6. AVISOS
+   ------------------------------ */
+.aviso {
+    padding: .85rem 1rem;
+    border-radius: var(--radius-sm);
+    font-size: .9rem;
+    margin-bottom: var(--space-md);
+    border: 1px solid;
+    line-height: 1.55;
+}
+
+.aviso-warning {
+    background: rgba(241, 196, 15, .08);
+    border-color: rgba(241, 196, 15, .4);
+    color: var(--color-warning);
+}
+
+.aviso-error {
+    background: rgba(255, 77, 77, .08);
+    border-color: rgba(255, 77, 77, .4);
+    color: var(--color-error);
+}
+
+.aviso-success {
+    background: rgba(46, 204, 113, .08);
+    border-color: rgba(46, 204, 113, .4);
+    color: var(--color-success);
+}
+
+/* ------------------------------
+   7. RESUMEN (PASO 2)
+   ------------------------------ */
+.resumen {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: var(--space-md);
+    display: flex;
+    flex-direction: column;
+    gap: .75rem;
+}
+
+.resumen-seccion {
+    padding-bottom: .75rem;
+    border-bottom: 1px dashed var(--color-border);
+}
+
+.resumen-seccion:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.resumen-seccion h4 {
+    font-size: .85rem;
+    color: var(--color-gold);
+    margin-bottom: .4rem;
+    letter-spacing: .05em;
+}
+
+.resumen-seccion p {
+    font-size: .92rem;
+    color: var(--color-text);
+    line-height: 1.5;
+}
+
+.resumen-seccion p strong {
+    color: var(--color-text);
+    font-weight: 600;
+}
+
+.resumen .resumen-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: .75rem;
+    border-top: 2px solid var(--color-gold);
+    font-family: var(--font-display);
+    text-transform: uppercase;
+    font-size: 1.1rem;
+    letter-spacing: .04em;
+}
+
+.resumen .resumen-total strong {
+    color: var(--color-gold);
+    font-size: 1.4rem;
+    font-weight: 700;
+}
+
+/* ------------------------------
+   8. NAVEGACIÓN DEL FORMULARIO
+   ------------------------------ */
+.form-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--space-sm);
+    margin-top: var(--space-lg);
+    padding-top: var(--space-md);
+    border-top: 1px solid var(--color-border);
+    flex-wrap: wrap;
+}
+
+.form-nav .btn {
+    flex: 1;
+    min-width: 130px;
+}
+
+@media (min-width: 600px) {
+    .form-nav .btn {
+        flex: 0 1 auto;
+        min-width: 180px;
+    }
+}
+
+/* ------------------------------
+   9. ACCESIBILIDAD
+   ------------------------------ */
+@media (prefers-reduced-motion: reduce) {
+
+    .paso,
+    .progress-fill,
+    .fecha-selects select {
+        animation: none;
+        transition: none;
+    }
+}

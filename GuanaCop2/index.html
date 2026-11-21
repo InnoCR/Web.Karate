@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Registro de peleas acordadas - Torneo Guana-Cup 2027 (solo adultos 18+)" />
+    <meta name="theme-color" content="#0a0a0a" />
+
+    <title>Peleas Acordadas | Guana-Cup 2027</title>
+
+    <!-- Etiquetas Open Graph para WhatsApp -->
+    <meta property="og:title" content="Registro de peleas acordadas - Torneo Guana-Cup 2027 (solo adultos 18+)">
+    <meta property="og:description"
+        content="Inscripción al Registro de peleas acordadas Guana-Cup 2027 - Kyokushin IBU. 20 de febrero de 2027. ¡Aquí nacen los campeones!">
+    <meta property="og:image" content="https://karate.innocr.com/assets/img/afiche2.jpg">
+    <meta property="og:type" content="website">
+
+    <!-- Favicon (assets compartidos) -->
+    <link rel="icon" type="image/x-icon" href="../assets/img/favicon.ico" />
+
+    <!-- Fuentes -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet" />
+
+    <!-- CSS del módulo -->
+    <link rel="stylesheet" href="css/base.css" />
+    <link rel="stylesheet" href="css/formulario.css" />
+    <link rel="stylesheet" href="css/confirmacion.css" />
+</head>
+
+<body>
+
+    <!-- ============================================= -->
+    <!-- HEADER DEL MÓDULO                              -->
+    <!-- ============================================= -->
+    <header class="gc2-header">
+        <div class="container gc2-header-inner">
+            <a href="../index.html" class="gc2-brand">
+                <img src="../assets/img/logo-ibu.png" alt="IBU Kyokushin" class="gc2-logo" />
+                <span>Guana-Cup 2026 · Peleas Acordadas</span>
+            </a>
+            <a href="../index.html" class="gc2-back">← Volver al torneo</a>
+        </div>
+    </header>
+
+    <!-- ============================================= -->
+    <!-- VISTA 1: FORMULARIO (2 PASOS)                  -->
+    <!-- ============================================= -->
+    <main id="vista-formulario-adultos" class="vista vista-activa">
+
+        <div class="container formulario-wrap">
+
+            <header class="formulario-header">
+                <h1>Registro de Peleas Acordadas</h1>
+                <p>Guana-Cup 2026 · Solo adultos (18+)</p>
+            </header>
+
+            <!-- Barra de progreso (2 pasos) -->
+            <div class="progress-wrap" aria-label="Progreso de registro">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFillAdultos" style="width: 50%"></div>
+                </div>
+                <ol class="progress-steps">
+                    <li class="step active" data-step="1"><span>1</span> Competidor</li>
+                    <li class="step" data-step="2"><span>2</span> Resumen</li>
+                </ol>
+            </div>
+
+            <!-- Mensaje de inscripciones cerradas (oculto por defecto) -->
+            <div class="aviso aviso-warning" id="avisoCerrado" hidden>
+                Las inscripciones de peleas acordadas están cerradas. Contacta al organizador por WhatsApp.
+            </div>
+
+            <form id="formAdultos" novalidate>
+
+                <!-- ============================================= -->
+                <!-- PASO 1: DATOS DEL COMPETIDOR                  -->
+                <!-- ============================================= -->
+                <fieldset class="paso activo" data-paso="1">
+                    <legend>Datos del competidor</legend>
+                    <p class="paso-desc">Ingresa tus datos personales. Debes tener al menos 18 años al día del torneo.
+                    </p>
+
+                    <div class="campo">
+                        <label for="ad_nombreCompleto">Nombre completo *</label>
+                        <input type="text" id="ad_nombreCompleto" name="ad_nombreCompleto" autocomplete="name"
+                            required />
+                        <small class="error-msg"></small>
+                    </div>
+
+                    <!-- Fecha de nacimiento: 3 selects (día / mes / año) -->
+                    <div class="campo">
+                        <label>Fecha de nacimiento *</label>
+                        <div class="fecha-selects">
+                            <select id="ad_diaNacimiento" name="ad_diaNacimiento" required>
+                                <option value="">Día</option>
+                            </select>
+                            <select id="ad_mesNacimiento" name="ad_mesNacimiento" required>
+                                <option value="">Mes</option>
+                                <option value="01">Enero</option>
+                                <option value="02">Febrero</option>
+                                <option value="03">Marzo</option>
+                                <option value="04">Abril</option>
+                                <option value="05">Mayo</option>
+                                <option value="06">Junio</option>
+                                <option value="07">Julio</option>
+                                <option value="08">Agosto</option>
+                                <option value="09">Setiembre</option>
+                                <option value="10">Octubre</option>
+                                <option value="11">Noviembre</option>
+                                <option value="12">Diciembre</option>
+                            </select>
+                            <select id="ad_anioNacimiento" name="ad_anioNacimiento" required>
+                                <option value="">Año</option>
+                            </select>
+                        </div>
+                        <input type="hidden" id="ad_fechaNacimiento" name="ad_fechaNacimiento" />
+                        <small class="error-msg"></small>
+                    </div>
+
+                    <div class="campo">
+                        <label for="ad_edadCalculada">Edad al torneo</label>
+                        <input type="text" id="ad_edadCalculada" name="ad_edadCalculada" readonly placeholder="—" />
+                        <small class="hint">Se calcula automáticamente al 05/12/2026</small>
+                    </div>
+
+                    <div class="campo-row">
+                        <div class="campo">
+                            <label for="ad_sexo">Sexo *</label>
+                            <select id="ad_sexo" name="ad_sexo" required>
+                                <option value="">Seleccione…</option>
+                                <option value="M">Masculino</option>
+                                <option value="F">Femenino</option>
+                            </select>
+                            <small class="error-msg"></small>
+                        </div>
+                        <div class="campo">
+                            <label for="ad_identificacion">Identificación *</label>
+                            <input type="text" id="ad_identificacion" name="ad_identificacion" required />
+                            <small class="error-msg"></small>
+                        </div>
+                    </div>
+
+                    <div class="campo-row">
+                        <div class="campo">
+                            <label for="ad_email">Correo electrónico *</label>
+                            <input type="email" id="ad_email" name="ad_email" autocomplete="email" required />
+                            <small class="error-msg"></small>
+                        </div>
+                        <div class="campo">
+                            <label for="ad_telefono">Teléfono *</label>
+                            <input type="tel" id="ad_telefono" name="ad_telefono" autocomplete="tel" required />
+                            <small class="error-msg"></small>
+                        </div>
+                    </div>
+
+                    <div class="campo-row">
+                        <div class="campo">
+                            <label for="ad_dojo">Dojo / Academia *</label>
+                            <input type="text" id="ad_dojo" name="ad_dojo" required />
+                            <small class="error-msg"></small>
+                        </div>
+                        <div class="campo">
+                            <label for="ad_sensei">Sensei / Instructor</label>
+                            <input type="text" id="ad_sensei" name="ad_sensei" />
+                        </div>
+                    </div>
+
+                    <div class="campo-row">
+                        <div class="campo">
+                            <label for="ad_grado">Grado (cinturón) *</label>
+                            <select id="ad_grado" name="grado" required>
+                                <option value="">Seleccione…</option>
+                                <option value="Blanco (Mukyu / Sin grado)">Blanco (Mukyu / Sin grado)</option>
+                                <option value="10º Kyu - Naranja">10º Kyu - Naranja</option>
+                                <option value="9º Kyu - Naranja con raya">9º Kyu - Naranja con raya</option>
+                                <option value="8º Kyu - Azul">8º Kyu - Azul</option>
+                                <option value="7º Kyu - Azul con raya">7º Kyu - Azul con raya</option>
+                                <option value="6º Kyu - Amarillo">6º Kyu - Amarillo</option>
+                                <option value="5º Kyu - Amarillo con raya">5º Kyu - Amarillo con raya</option>
+                                <option value="4º Kyu - Verde">4º Kyu - Verde</option>
+                                <option value="3º Kyu - Verde con raya">3º Kyu - Verde con raya</option>
+                                <option value="2º Kyu - Marrón">2º Kyu - Marrón</option>
+                                <option value="1º Kyu - Marrón con raya">1º Kyu - Marrón con raya</option>
+                                <option value="1º Dan - Negro">1º Dan - Negro</option>
+                                <option value="2º Dan - Negro">2º Dan - Negro</option>
+                                <option value="3º Dan - Negro">3º Dan - Negro</option>
+                                <option value="4º Dan - Negro">4º Dan - Negro</option>
+                                <option value="5º Dan - Negro">5º Dan - Negro</option>
+                            </select>
+                            <small class="error-msg"></small>
+                        </div>
+                        <div class="campo">
+                            <label for="ad_peso">Peso (kg) *</label>
+                            <input type="number" id="ad_peso" name="ad_peso" min="20" max="200" step="0.1" required />
+                            <small class="error-msg"></small>
+                        </div>
+                    </div>
+
+                    <div class="campo">
+                        <label for="ad_condiciones">Condiciones médicas o alergias (opcional)</label>
+                        <textarea id="ad_condiciones" name="ad_condiciones" rows="2"
+                            placeholder="Ej. asma, lesiones previas…"></textarea>
+                    </div>
+
+                    <!-- Aviso si es menor de edad -->
+                    <div class="aviso aviso-error" id="ad_avisoEdad" hidden>
+                        Debes ser mayor de 18 años al día del torneo para este registro.
+                    </div>
+                </fieldset>
+
+                <!-- ============================================= -->
+                <!-- PASO 2: RESUMEN + CONFIRMAR                   -->
+                <!-- ============================================= -->
+                <fieldset class="paso" data-paso="2">
+                    <legend>Resumen del registro</legend>
+                    <p class="paso-desc">Revisa que todo esté correcto antes de confirmar.</p>
+
+                    <div class="resumen" id="resumenAdultos">
+                        <!-- Se genera por JS -->
+                    </div>
+                </fieldset>
+
+                <!-- ============================================= -->
+                <!-- NAVEGACIÓN                                     -->
+                <!-- ============================================= -->
+                <div class="form-nav">
+                    <button type="button" class="btn btn-outline" id="btnAnteriorAdultos" disabled>
+                        ← Anterior
+                    </button>
+                    <button type="button" class="btn btn-primary" id="btnSiguienteAdultos">
+                        Siguiente →
+                    </button>
+                    <button type="button" class="btn btn-success" id="btnConfirmarAdultos" hidden>
+                        ✔ Confirmar registro
+                    </button>
+                </div>
+
+            </form>
+        </div>
+    </main>
+
+    <!-- ============================================= -->
+    <!-- VISTA 2: CONFIRMACIÓN                          -->
+    <!-- ============================================= -->
+    <main id="vista-confirmacion-adultos" class="vista">
+        <div class="container confirmacion-wrap">
+
+            <div class="confirmacion-icon" aria-hidden="true">✅</div>
+            <h1>¡Registro enviado!</h1>
+            <p class="confirmacion-sub">Guarda tu folio para coordinar el combate con el organizador.</p>
+
+            <!-- FOLIO: placeholder neutro, el JS lo llena con el valor real del backend -->
+            <div class="folio-box">
+                <span>Folio</span>
+                <strong id="folioTextoAdultos">—</strong>
+            </div>
+
+            <div class="resumen-final" id="resumenFinalAdultos">
+                <!-- Se genera por JS -->
+            </div>
+
+            <div class="total-final">
+                <span>Total a pagar:</span>
+                <strong id="totalFinalAdultos">₡0</strong>
+            </div>
+
+            <div class="sinpe-box">
+                <h3>Pago por SINPE Móvil</h3>
+                <p>
+                    Número: <strong id="sinpeNumeroAdultos">—</strong><br />
+                    Titular: <strong id="sinpeTitularAdultos">—</strong>
+                </p>
+            </div>
+
+            <div class="confirmacion-acciones">
+                <button class="btn btn-primary btn-lg" id="btnWhatsappAdultos">
+                    💬 Coordinar por WhatsApp
+                </button>
+            </div>
+
+            <p class="confirmacion-nota">
+                <strong>Importante:</strong> al abrir WhatsApp se enviará tu folio y monto
+                al organizador para coordinar el pago y los detalles del combate.
+            </p>
+
+            <a href="../index.html" class="btn btn-ghost">← Volver al sitio del torneo</a>
+        </div>
+    </main>
+
+    <!-- ============================================= -->
+    <!-- FOOTER DEL MÓDULO                              -->
+    <!-- ============================================= -->
+    <footer class="gc2-footer">
+        <div class="container">
+            <p>© 2026 Guana-Cup · International Budokai Union Kyokushin</p>
+            <p style="font-size:.78rem;color:var(--color-text-dim);margin-top:.3rem;">
+                Módulo de registro de peleas acordadas (adultos).
+            </p>
+        </div>
+    </footer>
+
+    <!-- ============================================= -->
+    <!-- SCRIPTS DEL MÓDULO (orden importa)             -->
+    <!-- ============================================= -->
+    <script src="js/config.js"></script>
+    <script src="js/navegacion.js"></script>
+    <script src="js/whatsapp.js"></script>
+    <script src="js/formulario.js"></script>
+
+</body>
+
+</html>

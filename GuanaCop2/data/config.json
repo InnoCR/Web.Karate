@@ -1,0 +1,36 @@
+{
+    "modulo": "peleas-acordadas",
+    "titulo": "Peleas Acordadas",
+    "subtitulo": "Registro exclusivo para adultos (18+)",
+    "torneo": "Guana-Cup 2026",
+    "organizacion": "International Budokai Union - Kyokushin",
+    "fechaTorneo": "2026-12-05",
+    "horaInicio": null,
+    "fechaLimiteInscripcion": "2026-11-28T23:59:59",
+    "inscripcionesAbiertas": true,
+    "logo": "../assets/img/logo-ibu.png",
+    "poster": "../assets/img/poster.jpg",
+    "moneda": "CRC",
+    "simboloMoneda": "₡",
+    "locale": "es-CR",
+    "whatsappOrganizador": "50660545660",
+    "sinpe": {
+        "numero": "6054-5660",
+        "titular": "Claudio Medrano"
+    },
+    "backend": {
+        "url": "https://script.google.com/macros/s/AKfycbzb7Y2gGQFVBv3jZWRFKD_fCIiraF3uBuZRk_Qfnk9C_RHHeJXR_ifHoXyFMkiIIfvAsg/exec",
+        "timeoutMs": 15000
+    },
+    "precioFijo": 15000,
+    "reglas": {
+        "edadMinima": 18,
+        "edadMaxima": 99,
+        "requiereTutor": false,
+        "requiereLiberacion": false,
+        "requiereCategorias": false
+    },
+    "whatsapp": {
+        "mensajeIntro": "🥋 *Pelea Acordada - Guana-Cup 2026*\n\nHola, soy {nombre}.\nFolio: *{folio}*\n*Total a pagar: {simbolo}{monto}*\n\nQuisiera coordinar el pago por SINPE Móvil y los detalles del combate."
+    }
+}
