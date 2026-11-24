@@ -1,42 +1,38 @@
 /* =========================================================
-   GUANACOP2 · formulario.js
-   Orquesta el flujo de 2 pasos: navegación, validaciones,
-   edad al torneo (con fecha en 3 selects), resumen,
-   POST al backend con monto fijo, folio y confirmación
+   GUANACUP2 · formulario.js
+   Orquesta el flujo de 3 pasos: datos → liberación (con
+   canvas de firma) → resumen. POST al backend, folio,
+   confirmación y descarga AUTOMÁTICA del PDF.
    ========================================================= */
 
 (function () {
     'use strict';
 
     // ============================================
-    // ESTADO DEL FORMULARIO
+    // ESTADO
     // ============================================
     const estado = {
         pasoActual: 1,
-        totalPasos: 2,
+        totalPasos: 3,
         datos: {},
+        firma: null,
         folio: null,
         monto: 0,
+        fechaAceptacion: null,
         enviando: false
     };
 
-    // Referencias DOM
     let form, pasos, progressFill, steps, btnAnterior, btnSiguiente, btnConfirmar;
 
     // ============================================
-    // ARRANQUE: esperar a que GC2 esté listo
+    // ARRANQUE
     // ============================================
     function arrancar() {
-        // Si config.js ya terminó, inicializar ya
         if (window.GC2 && window.GC2.config) {
             init();
             return;
         }
-
-        // Si aún no, esperar el evento
         document.addEventListener('gc2:config-listo', init, { once: true });
-
-        // Timeout de seguridad: si en 5s no llegó, mostrar error
         setTimeout(() => {
             if (!window.GC2 || !window.GC2.config) {
                 console.error('[GC2] formulario.js: config no cargó en 5s. Revisa data/config.json.');
@@ -45,7 +41,7 @@
     }
 
     // ============================================
-    // INICIALIZACIÓN
+    // INIT
     // ============================================
     function init() {
         form = document.getElementById('formAdultos');
@@ -61,39 +57,38 @@
         btnSiguiente = document.getElementById('btnSiguienteAdultos');
         btnConfirmar = document.getElementById('btnConfirmarAdultos');
 
-        // Verificación de botones
         if (!btnAnterior || !btnSiguiente || !btnConfirmar) {
             console.error('[GC2] Faltan botones de navegación en el DOM');
             return;
         }
 
-        // Monto fijo desde config
         estado.monto = Number(window.GC2.precioFijo) || 15000;
 
-        // Eventos de navegación
         btnAnterior.addEventListener('click', irAnterior);
         btnSiguiente.addEventListener('click', irSiguiente);
         btnConfirmar.addEventListener('click', confirmar);
 
-        // Poblar selects de fecha y enganchar eventos
         poblarSelectsFecha();
         ['ad_diaNacimiento', 'ad_mesNacimiento', 'ad_anioNacimiento'].forEach((id) => {
             const el = document.getElementById(id);
             if (el) el.addEventListener('change', sincronizarFechaNacimiento);
         });
 
-        // Botón WhatsApp
         const btnWa = document.getElementById('btnWhatsappAdultos');
         if (btnWa) btnWa.addEventListener('click', enviarWhatsApp);
 
-        // Estado inicial
+        const btnPdf = document.getElementById('btnDescargarLiberacion');
+        if (btnPdf) btnPdf.addEventListener('click', descargarLiberacion);
+
         mostrarPaso(1);
 
         console.info('[GC2] Formulario listo. Monto fijo:', estado.monto);
         console.info('[GC2] Botones enganchados:', {
             anterior: !!btnAnterior,
             siguiente: !!btnSiguiente,
-            confirmar: !!btnConfirmar
+            confirmar: !!btnConfirmar,
+            whatsapp: !!btnWa,
+            descargarPdf: !!btnPdf
         });
     }
 
@@ -115,7 +110,7 @@
         }
 
         const cfg = window.GC2 && window.GC2.config;
-        const anioTorneo = cfg ? new Date(cfg.fechaTorneo).getFullYear() : 2026;
+        const anioTorneo = cfg ? new Date(cfg.fechaTorneo).getFullYear() : 2027;
         const minAnio = 1920;
         const maxAnio = anioTorneo - 18;
 
@@ -168,63 +163,50 @@
     }
 
     // ============================================
-    // NAVEGACIÓN ENTRE PASOS
+    // NAVEGACIÓN
     // ============================================
     function mostrarPaso(n) {
         estado.pasoActual = n;
 
-        // Fieldset activo
         pasos.forEach((p) => {
             p.classList.toggle('activo', Number(p.dataset.paso) === n);
         });
 
-        // Steps visuales
         steps.forEach((s) => {
             s.classList.toggle('active', Number(s.dataset.step) <= n);
         });
 
-        // Barra
         if (progressFill) {
             progressFill.style.width = `${(n / estado.totalPasos) * 100}%`;
         }
 
-        // ---- Botones: control robusto ----
-        // Anterior: visible siempre, deshabilitado en paso 1
         btnAnterior.style.display = '';
         btnAnterior.disabled = n === 1;
 
-        // Siguiente: visible solo en paso 1
-        if (n === 1) {
-            btnSiguiente.style.display = '';
-            btnSiguiente.disabled = false;
-            btnSiguiente.hidden = false;
-        } else {
+        if (n === estado.totalPasos) {
             btnSiguiente.style.display = 'none';
             btnSiguiente.hidden = true;
-        }
-
-        // Confirmar: visible solo en paso 2 (último)
-        if (n === estado.totalPasos) {
             btnConfirmar.style.display = '';
-            btnConfirmar.disabled = false;
             btnConfirmar.hidden = false;
+            btnConfirmar.disabled = false;
         } else {
+            btnSiguiente.style.display = '';
+            btnSiguiente.hidden = false;
+            btnSiguiente.disabled = false;
             btnConfirmar.style.display = 'none';
             btnConfirmar.hidden = true;
         }
 
-        // Al entrar al paso 2, armar resumen
-        if (n === 2) {
+        if (n === 3) {
             armarResumen();
         }
 
-        // Scroll arriba
         const wrap = form.closest('.formulario-wrap');
         if (wrap) {
             wrap.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
-        console.info('[GC2] Paso actual:', n, '| Siguiente:', n === 1 ? 'visible' : 'oculto', '| Confirmar:', n === 2 ? 'visible' : 'oculto');
+        console.info('[GC2] Paso actual:', n);
     }
 
     function irAnterior() {
@@ -236,40 +218,33 @@
 
     function irSiguiente() {
         if (estado.enviando) return;
-        if (!validarPaso(estado.pasoActual)) return;
 
         if (estado.pasoActual === 1) {
+            if (!validarPaso1()) return;
             capturarDatosCompetidor();
             if (!validarEdadAdulto()) return;
         }
 
+        if (estado.pasoActual === 2) {
+            if (!window.GC2.liberacionUI.validarFirma()) return;
+            estado.firma = window.GC2.liberacionUI.obtenerDatosFirma();
+        }
+
         if (estado.pasoActual < estado.totalPasos) {
-            mostrarPaso(estado.pasoActual + 1);
+            const siguiente = estado.pasoActual + 1;
+            mostrarPaso(siguiente);
+
+            if (siguiente === 2) {
+                window.GC2.liberacionUI.prellenarFirmante(estado.datos);
+            }
         }
     }
 
     // ============================================
-    // CAPTURA Y VALIDACIÓN DE DATOS
+    // VALIDACIONES
     // ============================================
-    function capturarDatosCompetidor() {
-        estado.datos = {
-            nombreCompleto: form.querySelector('#ad_nombreCompleto').value.trim(),
-            fechaNacimiento: form.querySelector('#ad_fechaNacimiento').value,
-            edadCalculada: form.querySelector('#ad_edadCalculada').value,
-            sexo: form.querySelector('#ad_sexo').value,
-            identificacion: form.querySelector('#ad_identificacion').value.trim(),
-            email: form.querySelector('#ad_email').value.trim(),
-            telefono: form.querySelector('#ad_telefono').value.trim(),
-            dojo: form.querySelector('#ad_dojo').value.trim(),
-            sensei: form.querySelector('#ad_sensei').value.trim(),
-            grado: form.querySelector('#ad_grado').value,
-            peso: form.querySelector('#ad_peso').value,
-            condiciones: form.querySelector('#ad_condiciones').value.trim()
-        };
-    }
-
-    function validarPaso(paso) {
-        const fieldset = form.querySelector(`.paso[data-paso="${paso}"]`);
+    function validarPaso1() {
+        const fieldset = form.querySelector('.paso[data-paso="1"]');
         if (!fieldset) return true;
 
         let ok = true;
@@ -286,29 +261,27 @@
             }
         });
 
-        if (paso === 1) {
-            const email = fieldset.querySelector('#ad_email');
-            if (email && email.value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)) {
-                marcarInvalido(email.closest('.campo'), 'Correo electrónico inválido.');
-                ok = false;
-            }
+        const email = fieldset.querySelector('#ad_email');
+        if (email && email.value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)) {
+            marcarInvalido(email.closest('.campo'), 'Correo electrónico inválido.');
+            ok = false;
+        }
 
-            const tel = fieldset.querySelector('#ad_telefono');
-            if (tel && tel.value && tel.value.replace(/\D/g, '').length < 8) {
-                marcarInvalido(tel.closest('.campo'), 'Teléfono inválido (mínimo 8 dígitos).');
-                ok = false;
-            }
+        const tel = fieldset.querySelector('#ad_telefono');
+        if (tel && tel.value && tel.value.replace(/\D/g, '').length < 8) {
+            marcarInvalido(tel.closest('.campo'), 'Teléfono inválido (mínimo 8 dígitos).');
+            ok = false;
+        }
 
-            const hiddenFecha = fieldset.querySelector('#ad_fechaNacimiento');
-            const diaSel = fieldset.querySelector('#ad_diaNacimiento');
-            const mesSel = fieldset.querySelector('#ad_mesNacimiento');
-            const anioSel = fieldset.querySelector('#ad_anioNacimiento');
-            if (hiddenFecha && diaSel && mesSel && anioSel) {
-                if (!diaSel.value || !mesSel.value || !anioSel.value || !hiddenFecha.value) {
-                    const campo = hiddenFecha.closest('.campo');
-                    if (campo) marcarInvalido(campo, 'Debes indicar día, mes y año de nacimiento.');
-                    ok = false;
-                }
+        const hiddenFecha = fieldset.querySelector('#ad_fechaNacimiento');
+        const diaSel = fieldset.querySelector('#ad_diaNacimiento');
+        const mesSel = fieldset.querySelector('#ad_mesNacimiento');
+        const anioSel = fieldset.querySelector('#ad_anioNacimiento');
+        if (hiddenFecha && diaSel && mesSel && anioSel) {
+            if (!diaSel.value || !mesSel.value || !anioSel.value || !hiddenFecha.value) {
+                const campo = hiddenFecha.closest('.campo');
+                if (campo) marcarInvalido(campo, 'Debes indicar día, mes y año de nacimiento.');
+                ok = false;
             }
         }
 
@@ -330,20 +303,39 @@
     }
 
     function marcarInvalido(campo, msg) {
+        if (!campo) return;
         campo.classList.add('invalido');
         const err = campo.querySelector('.error-msg');
         if (err) err.textContent = msg || 'Campo inválido.';
     }
 
     function limpiarInvalido(campo) {
+        if (!campo) return;
         campo.classList.remove('invalido');
         const err = campo.querySelector('.error-msg');
         if (err) err.textContent = '';
     }
 
     // ============================================
-    // CÁLCULO DE EDAD
+    // CAPTURA Y EDAD
     // ============================================
+    function capturarDatosCompetidor() {
+        estado.datos = {
+            nombreCompleto: form.querySelector('#ad_nombreCompleto').value.trim(),
+            fechaNacimiento: form.querySelector('#ad_fechaNacimiento').value,
+            edadCalculada: form.querySelector('#ad_edadCalculada').value,
+            sexo: form.querySelector('#ad_sexo').value,
+            identificacion: form.querySelector('#ad_identificacion').value.trim(),
+            email: form.querySelector('#ad_email').value.trim(),
+            telefono: form.querySelector('#ad_telefono').value.trim(),
+            dojo: form.querySelector('#ad_dojo').value.trim(),
+            sensei: form.querySelector('#ad_sensei').value.trim(),
+            grado: form.querySelector('#ad_grado').value,
+            peso: form.querySelector('#ad_peso').value,
+            condiciones: form.querySelector('#ad_condiciones').value.trim()
+        };
+    }
+
     function calcularEdadYValidar() {
         const hiddenFecha = document.getElementById('ad_fechaNacimiento');
         const edadInput = document.getElementById('ad_edadCalculada');
@@ -369,9 +361,7 @@
         edadInput.value = `${edad} años`;
 
         const min = (cfg.reglas && cfg.reglas.edadMinima) || 18;
-        if (aviso) {
-            aviso.hidden = edad >= min;
-        }
+        if (aviso) aviso.hidden = edad >= min;
     }
 
     function validarEdadAdulto() {
@@ -391,7 +381,7 @@
     }
 
     // ============================================
-    // RESUMEN
+    // RESUMEN (PASO 3) — SIN datos del firmante
     // ============================================
     function armarResumen() {
         const cont = document.getElementById('resumenAdultos');
@@ -400,6 +390,7 @@
         const esc = window.GC2.utils.escaparHTML;
         const fmt = window.GC2.utils.formatearMonto;
         const d = estado.datos;
+        const f = estado.firma || window.GC2.liberacionUI.obtenerDatosFirma();
         const total = estado.monto;
 
         cont.innerHTML = `
@@ -418,6 +409,10 @@
         </p>
       </div>
       ${d.condiciones ? `<div class="resumen-seccion"><h4>Condiciones médicas</h4><p>${esc(d.condiciones)}</p></div>` : ''}
+      <div class="resumen-seccion">
+        <h4>Liberación de responsabilidad</h4>
+        <p>✅ Aceptada · Versión ${esc(f.version || 'v1.0-2027')}</p>
+      </div>
       <div class="resumen-total">
         <span>Total a pagar</span>
         <strong>${fmt(total)}</strong>
@@ -426,7 +421,7 @@
     }
 
     // ============================================
-    // CONFIRMACIÓN
+    // CONFIRMACIÓN → POST + DESCARGA AUTOMÁTICA
     // ============================================
     async function confirmar() {
         if (estado.enviando) return;
@@ -437,6 +432,14 @@
             return;
         }
 
+        if (!window.GC2.liberacionUI.validarFirma()) {
+            mostrarPaso(2);
+            return;
+        }
+        window.GC2.liberacionUI.finalizarFirma();
+        estado.firma = window.GC2.liberacionUI.obtenerDatosFirma();
+        estado.fechaAceptacion = estado.firma.fechaAceptacion;
+
         estado.enviando = true;
         btnConfirmar.disabled = true;
         const textoOriginal = btnConfirmar.textContent;
@@ -444,7 +447,7 @@
 
         try {
             const payload = {
-                tipo: 'peleas-acordadas',
+                tipo: 'peleas-pactadas',
                 competidor: {
                     nombreCompleto: estado.datos.nombreCompleto,
                     fechaNacimiento: estado.datos.fechaNacimiento,
@@ -458,6 +461,14 @@
                     grado: estado.datos.grado,
                     peso: estado.datos.peso,
                     condiciones: estado.datos.condiciones
+                },
+                firma: {
+                    nombre: estado.firma.nombre,
+                    identificacion: estado.firma.identificacion,
+                    acepto: estado.firma.acepto,
+                    fechaAceptacion: estado.firma.fechaAceptacion,
+                    version: estado.firma.version,
+                    firmaImagen: estado.firma.firmaImagen
                 },
                 totalPagar: estado.monto
             };
@@ -482,6 +493,26 @@
             if (!data.ok) throw new Error(data.error || 'El servidor rechazó el registro');
 
             estado.folio = data.folio;
+
+            // ============================================
+            // DESCARGA AUTOMÁTICA DEL PDF
+            // ============================================
+            try {
+                window.GC2.pdf.descargarPDF({
+                    competidor: estado.datos,
+                    firma: estado.firma,
+                    folio: estado.folio,
+                    monto: estado.monto,
+                    fechaHora: estado.fechaAceptacion || new Date().toISOString(),
+                    config: window.GC2.config,
+                    liberacion: window.GC2.liberacion
+                });
+                console.info('[GC2] PDF de liberación descargado automáticamente.');
+            } catch (e) {
+                console.warn('[GC2] No se pudo descargar el PDF automáticamente:', e);
+                // No bloquea el flujo — el usuario puede descargarlo manualmente
+            }
+
             pintarConfirmacion();
             if (window.GC2.irA) window.GC2.irA('confirmacion');
 
@@ -536,6 +567,47 @@
           </p>
         </div>
       `;
+        }
+    }
+
+    // ============================================
+    // DESCARGA MANUAL DEL PDF (botón "Descargar de nuevo")
+    // ============================================
+    function descargarLiberacion() {
+        if (!estado.folio) {
+            alert('Primero debes confirmar el registro para generar el PDF.');
+            return;
+        }
+
+        if (!window.GC2.pdf) {
+            alert('El módulo de PDF no está disponible. Recarga la página.');
+            return;
+        }
+
+        const firma = estado.firma || window.GC2.liberacionUI.obtenerDatosFirma();
+        if (!firma || !firma.firmaImagen) {
+            alert('La firma no está disponible. Vuelve al Paso 2 y dibuja tu firma.');
+            return;
+        }
+
+        if (!window.GC2.liberacion || !Array.isArray(window.GC2.liberacion.secciones)) {
+            alert('El texto de liberación no está cargado. Recarga la página.');
+            return;
+        }
+
+        try {
+            window.GC2.pdf.descargarPDF({
+                competidor: estado.datos,
+                firma: firma,
+                folio: estado.folio,
+                monto: estado.monto,
+                fechaHora: estado.fechaAceptacion || new Date().toISOString(),
+                config: window.GC2.config,
+                liberacion: window.GC2.liberacion
+            });
+        } catch (err) {
+            console.error('[GC2] Error al generar PDF:', err);
+            alert('Error al generar PDF: ' + err.message);
         }
     }
 

@@ -1,7 +1,8 @@
 /* =========================================================
-   GUANACOP2 · whatsapp.js
+   GUANACUP2 · whatsapp.js
    Construye el mensaje desde la plantilla del config
-   y abre wa.me con el texto prellenado
+   y abre wa.me con el texto prellenado.
+   Incluye recordatorio de adjuntar el PDF de liberación.
    ========================================================= */
 
 (function () {
@@ -25,7 +26,6 @@
      * @param {object} registro
      * @param {string} registro.nombre
      * @param {string} registro.folio
-     * @param {Array<string>} registro.categorias  Nombres de categorías
      * @param {number} registro.monto
      * @returns {string}
      */
@@ -37,14 +37,15 @@
         }
 
         const plantilla = (cfg.whatsapp && cfg.whatsapp.mensajeIntro) ||
-            'Hola, soy {nombre}. Folio: {folio}. Categorías: {categorias}. Total: {simbolo}{monto}.';
+            'Hola, soy {nombre}. Folio: {folio}. Total: {simbolo}{monto}.';
 
         return interpolar(plantilla, {
             nombre: registro.nombre || '',
             folio: registro.folio || '',
-            categorias: Array.isArray(registro.categorias) ? registro.categorias.join(', ') : (registro.categorias || ''),
             simbolo: cfg.simboloMoneda || '₡',
-            monto: Number(registro.monto || 0).toLocaleString(cfg.locale || 'es-CR', { maximumFractionDigits: 0 })
+            monto: Number(registro.monto || 0).toLocaleString(cfg.locale || 'es-CR', {
+                maximumFractionDigits: 0
+            })
         });
     }
 
@@ -73,13 +74,29 @@
         abrirWhatsApp(mensaje);
     }
 
-    // API pública
+    /**
+     * Construye un link wa.me sin abrirlo (útil para tests o preview).
+     * @param {object} registro
+     * @returns {string}
+     */
+    function construirUrl(registro) {
+        const cfg = window.GC2.config;
+        if (!cfg || !cfg.whatsappOrganizador) return '';
+        const numero = String(cfg.whatsappOrganizador).replace(/\D/g, '');
+        const mensaje = construirMensaje(registro);
+        return `https://wa.me/${numero}?text=${encodeURIComponent(mensaje)}`;
+    }
+
+    // ============================================
+    // API PÚBLICA
+    // ============================================
     window.GC2 = window.GC2 || {};
     window.GC2.whatsapp = {
         construirMensaje,
         abrirWhatsApp,
-        enviar
+        enviar,
+        construirUrl
     };
 
-    console.info('[GC2] WhatsApp listo.');
+    console.info('[GC2] whatsapp.js cargado.');
 })();

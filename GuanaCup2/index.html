@@ -4,17 +4,16 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Registro de Adultos - Peleas Pactadas" />
+    <meta name="description" content="Registro de Peleas Pactadas - Guana-Cup 2027 (adultos 18+)" />
     <meta name="theme-color" content="#0a0a0a" />
 
     <title>Peleas Pactadas | Guana-Cup 2027</title>
 
     <!-- Etiquetas Open Graph para WhatsApp -->
-    <meta property="og:title" content="Registro de Adultos">
-    <meta property="og:description"
-        content="Inscripción al Registro de Adultos - Peleas Pactadas - Guana - Cup 2027">
-    <meta property="og:image" content="https://karate.innocr.com/assets/img/afiche2.jpg">
-    <meta property="og:type" content="website">
+    <meta property="og:title" content="Registro de Adultos" />
+    <meta property="og:description" content="Inscripción al Registro de Adultos - Peleas Pactadas - Guana - Cup 2027" />
+    <meta property="og:image" content="https://karate.innocr.com/assets/img/afiche2.jpg" />
+    <meta property="og:type" content="website" />
 
     <!-- Favicon (assets compartidos) -->
     <link rel="icon" type="image/x-icon" href="../assets/img/favicon.ico" />
@@ -41,14 +40,14 @@
         <div class="container gc2-header-inner">
             <a href="../index.html" class="gc2-brand">
                 <img src="../assets/img/logo-ibu.png" alt="IBU Kyokushin" class="gc2-logo" />
-                <span>Guana-Cup 2026 · Peleas Pactadas</span>
+                <span>Guana-Cup 2027 · Peleas Pactadas</span>
             </a>
             <a href="../index.html" class="gc2-back">← Volver al torneo</a>
         </div>
     </header>
 
     <!-- ============================================= -->
-    <!-- VISTA 1: FORMULARIO (2 PASOS)                  -->
+    <!-- VISTA 1: FORMULARIO (3 PASOS)                  -->
     <!-- ============================================= -->
     <main id="vista-formulario-adultos" class="vista vista-activa">
 
@@ -56,21 +55,22 @@
 
             <header class="formulario-header">
                 <h1>Registro de Peleas Pactadas</h1>
-                <p>Guana-Cup 2026 · Solo adultos (18+)</p>
+                <p>Guana-Cup 2027 · Solo adultos (18+)</p>
             </header>
 
-            <!-- Barra de progreso (2 pasos) -->
+            <!-- Barra de progreso (3 pasos) -->
             <div class="progress-wrap" aria-label="Progreso de registro">
                 <div class="progress-bar">
-                    <div class="progress-fill" id="progressFillAdultos" style="width: 50%"></div>
+                    <div class="progress-fill" id="progressFillAdultos" style="width: 33.33%"></div>
                 </div>
                 <ol class="progress-steps">
                     <li class="step active" data-step="1"><span>1</span> Competidor</li>
-                    <li class="step" data-step="2"><span>2</span> Resumen</li>
+                    <li class="step" data-step="2"><span>2</span> Liberación</li>
+                    <li class="step" data-step="3"><span>3</span> Resumen</li>
                 </ol>
             </div>
 
-            <!-- Mensaje de inscripciones cerradas (oculto por defecto) -->
+            <!-- Mensaje de inscripciones cerradas -->
             <div class="aviso aviso-warning" id="avisoCerrado" hidden>
                 Las inscripciones de peleas pactadas están cerradas. Contacta al organizador por WhatsApp.
             </div>
@@ -92,7 +92,7 @@
                         <small class="error-msg"></small>
                     </div>
 
-                    <!-- Fecha de nacimiento: 3 selects (día / mes / año) -->
+                    <!-- Fecha de nacimiento: 3 selects -->
                     <div class="campo">
                         <label>Fecha de nacimiento *</label>
                         <div class="fecha-selects">
@@ -125,7 +125,7 @@
                     <div class="campo">
                         <label for="ad_edadCalculada">Edad al torneo</label>
                         <input type="text" id="ad_edadCalculada" name="ad_edadCalculada" readonly placeholder="—" />
-                        <small class="hint">Se calcula automáticamente al 05/12/2026</small>
+                        <small class="hint">Se calcula automáticamente al 20/02/2027</small>
                     </div>
 
                     <div class="campo-row">
@@ -173,7 +173,7 @@
                     <div class="campo-row">
                         <div class="campo">
                             <label for="ad_grado">Grado (cinturón) *</label>
-                            <select id="ad_grado" name="grado" required>
+                            <select id="ad_grado" name="ad_grado" required>
                                 <option value="">Seleccione…</option>
                                 <option value="Blanco (Mukyu / Sin grado)">Blanco (Mukyu / Sin grado)</option>
                                 <option value="10º Kyu - Naranja">10º Kyu - Naranja</option>
@@ -207,16 +207,65 @@
                             placeholder="Ej. asma, lesiones previas…"></textarea>
                     </div>
 
-                    <!-- Aviso si es menor de edad -->
                     <div class="aviso aviso-error" id="ad_avisoEdad" hidden>
                         Debes ser mayor de 18 años al día del torneo para este registro.
                     </div>
                 </fieldset>
 
                 <!-- ============================================= -->
-                <!-- PASO 2: RESUMEN + CONFIRMAR                   -->
+                <!-- PASO 2: LIBERACIÓN DE RESPONSABILIDAD         -->
                 <!-- ============================================= -->
                 <fieldset class="paso" data-paso="2">
+                    <legend>Liberación de responsabilidad</legend>
+                    <p class="paso-desc">Lee el texto completo, dibuja tu firma y acepta para continuar.</p>
+
+                    <!-- Texto legal (lo llena liberacion.js) -->
+                    <div class="liberacion-texto" id="liberacionTexto">
+                        <p class="loading">Cargando texto de liberación…</p>
+                    </div>
+
+                    <!-- Datos del firmante (readonly, auto-rellenados del Paso 1) -->
+                    <div class="campo">
+                        <label for="ad_firmaNombre">Firmante (responsable)</label>
+                        <input type="text" id="ad_firmaNombre" name="ad_firmaNombre" readonly disabled />
+                        <small class="hint">Se toma del Paso 1 — como adulto eres responsable de tus actos.</small>
+                        <small class="error-msg"></small>
+                    </div>
+
+                    <div class="campo">
+                        <label for="ad_firmaIdentificacion">Identificación del firmante</label>
+                        <input type="text" id="ad_firmaIdentificacion" name="ad_firmaIdentificacion" readonly
+                            disabled />
+                        <small class="error-msg"></small>
+                    </div>
+
+                    <!-- Canvas de firma -->
+                    <div class="campo">
+                        <label>Firma digital *</label>
+                        <div class="firma-wrap" id="ad_firmaWrap">
+                            <canvas id="ad_firmaCanvas" width="600" height="180"></canvas>
+                            <button type="button" class="btn btn-ghost btn-sm" id="ad_btnLimpiarFirma">
+                                🗑️ Limpiar firma
+                            </button>
+                        </div>
+                        <small class="hint">Dibuja tu firma con el dedo o el mouse</small>
+                        <small class="error-msg" id="ad_firmaError"></small>
+                    </div>
+
+                    <!-- Check de aceptación -->
+                    <div class="campo-check">
+                        <input type="checkbox" id="ad_aceptoLiberacion" name="ad_aceptoLiberacion" required />
+                        <label for="ad_aceptoLiberacion">
+                            He leído y acepto los términos de la liberación de responsabilidad. *
+                        </label>
+                        <small class="error-msg"></small>
+                    </div>
+                </fieldset>
+
+                <!-- ============================================= -->
+                <!-- PASO 3: RESUMEN + CONFIRMAR                   -->
+                <!-- ============================================= -->
+                <fieldset class="paso" data-paso="3">
                     <legend>Resumen del registro</legend>
                     <p class="paso-desc">Revisa que todo esté correcto antes de confirmar.</p>
 
@@ -252,9 +301,8 @@
 
             <div class="confirmacion-icon" aria-hidden="true">✅</div>
             <h1>¡Registro enviado!</h1>
-            <p class="confirmacion-sub">Guarda tu folio para coordinar el combate con el organizador.</p>
+            <p class="confirmacion-sub">Guarda tu folio y adjunta tu liberación en WhatsApp.</p>
 
-            <!-- FOLIO: placeholder neutro, el JS lo llena con el valor real del backend -->
             <div class="folio-box">
                 <span>Folio</span>
                 <strong id="folioTextoAdultos">—</strong>
@@ -278,14 +326,17 @@
             </div>
 
             <div class="confirmacion-acciones">
+                <button class="btn btn-outline btn-lg" id="btnDescargarLiberacion">
+                    📄 Descargar de nuevo mi liberación
+                </button>
                 <button class="btn btn-primary btn-lg" id="btnWhatsappAdultos">
                     💬 Coordinar por WhatsApp
                 </button>
             </div>
 
             <p class="confirmacion-nota">
-                <strong>Importante:</strong> al abrir WhatsApp se enviará tu folio y monto
-                al organizador para coordinar el pago y los detalles del combate.
+                <strong>Importante:</strong> tu liberación en PDF se descargó automáticamente.
+                Adjúntala en WhatsApp junto con el mensaje antes de enviarlo.
             </p>
 
             <a href="../index.html" class="btn btn-ghost">← Volver al sitio del torneo</a>
@@ -297,7 +348,7 @@
     <!-- ============================================= -->
     <footer class="gc2-footer">
         <div class="container">
-            <p>© 2026 Guana-Cup · International Budokai Union Kyokushin</p>
+            <p>© 2027 Guana-Cup · International Budokai Union Kyokushin</p>
             <p style="font-size:.78rem;color:var(--color-text-dim);margin-top:.3rem;">
                 Módulo de registro de peleas pactadas (adultos).
             </p>
@@ -305,10 +356,17 @@
     </footer>
 
     <!-- ============================================= -->
+    <!-- LIBRERÍAS (antes que los scripts del módulo)   -->
+    <!-- ============================================= -->
+    <script src="libs/jspdf.umd.min.js"></script>
+
+    <!-- ============================================= -->
     <!-- SCRIPTS DEL MÓDULO (orden importa)             -->
     <!-- ============================================= -->
     <script src="js/config.js"></script>
     <script src="js/navegacion.js"></script>
+    <script src="js/liberacion.js"></script>
+    <script src="js/pdf.js"></script>
     <script src="js/whatsapp.js"></script>
     <script src="js/formulario.js"></script>
 

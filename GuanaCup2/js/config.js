@@ -1,7 +1,7 @@
 /* =========================================================
-   GUANACOP2 · config.js
-   Carga config.json, calcula fechas derivadas y expone
-   todo en window.GC2 (con precio fijo, sin categorías)
+   GUANACUP2 · config.js
+   Carga config.json y liberacion-texto.json, calcula fechas
+   derivadas y expone todo en window.GC2
    ========================================================= */
 
 (function () {
@@ -9,17 +9,11 @@
 
     window.GC2 = {
         config: null,
+        liberacion: null,
         listo: false,
         error: null,
 
         utils: {
-            /**
-             * Calcula la edad exacta (en años) de una fecha de nacimiento
-             * respecto a una fecha de referencia.
-             * @param {string|Date} fechaNacimiento
-             * @param {string|Date} fechaReferencia
-             * @returns {number}
-             */
             calcularEdad(fechaNacimiento, fechaReferencia) {
                 const nac = new Date(fechaNacimiento);
                 const ref = new Date(fechaReferencia);
@@ -32,11 +26,6 @@
                 return edad;
             },
 
-            /**
-             * Formatea un monto con separadores de miles y símbolo de moneda.
-             * @param {number} monto
-             * @returns {string}  Ej: "₡15 000"
-             */
             formatearMonto(monto) {
                 const cfg = window.GC2.config;
                 const simbolo = (cfg && cfg.simboloMoneda) || '₡';
@@ -45,11 +34,6 @@
                 return simbolo + num.toLocaleString(locale, { maximumFractionDigits: 0 });
             },
 
-            /**
-             * Escapa texto para insertarlo de forma segura en HTML.
-             * @param {string} str
-             * @returns {string}
-             */
             escaparHTML(str) {
                 return String(str == null ? '' : str)
                     .replace(/&/g, '&amp;')
@@ -57,15 +41,22 @@
                     .replace(/>/g, '&gt;')
                     .replace(/"/g, '&quot;')
                     .replace(/'/g, '&#39;');
+            },
+
+            formatearFechaLarga(fechaISO) {
+                const fecha = new Date(fechaISO + 'T00:00:00');
+                if (isNaN(fecha)) return fechaISO;
+                const cfg = window.GC2.config;
+                const locale = (cfg && cfg.locale) || 'es-CR';
+                return fecha.toLocaleDateString(locale, {
+                    day: '2-digit',
+                    month: 'long',
+                    year: 'numeric'
+                });
             }
         }
     };
 
-    /**
-     * Carga un JSON con fetch y lanza error si falla.
-     * @param {string} url
-     * @returns {Promise<any>}
-     */
     async function cargarJSON(url) {
         const res = await fetch(url, { cache: 'no-store' });
         if (!res.ok) {
@@ -74,11 +65,6 @@
         return res.json();
     }
 
-    /**
-     * Valida que el config tenga los campos mínimos requeridos,
-     * incluida una URL de backend válida y un precio fijo numérico.
-     * @param {object} cfg
-     */
     function validarConfig(cfg) {
         const requeridos = [
             'torneo',
@@ -91,12 +77,14 @@
             throw new Error(`config.json: faltan campos requeridos → ${faltantes.join(', ')}`);
         }
 
-        // Validar precioFijo
         if (cfg.precioFijo == null || isNaN(Number(cfg.precioFijo)) || Number(cfg.precioFijo) <= 0) {
             throw new Error('config.json: "precioFijo" debe ser un número mayor a 0.');
         }
 
-        // Validación estricta del backend
+        if (!cfg.liberacion || !cfg.liberacion.archivo) {
+            throw new Error('config.json: falta la sección "liberacion.archivo".');
+        }
+
         if (!cfg.backend || typeof cfg.backend !== 'object') {
             throw new Error('config.json: falta la sección "backend".');
         }
@@ -108,16 +96,38 @@
             throw new Error('config.json: debes reemplazar "TU_DEPLOY_ID_AQUI" por la URL real del Web App de Apps Script.');
         }
         if (!/^https:\/\/script\.google\.com\/macros\/s\/[^/]+\/exec/.test(url)) {
-            throw new Error('config.json: backend.url no parece una URL válida de Apps Script (debe empezar con https://script.google.com/macros/s/.../exec).');
+            throw new Error('config.json: backend.url no parece una URL válida de Apps Script.');
         }
     }
 
     /**
-     * Indica si las inscripciones están activas según:
-     *  - bandera manual inscripcionesAbiertas
-     *  - fecha límite de inscripción
-     * @returns {boolean}
+     * Valida la nueva estructura de liberacion-texto.json:
+     * {
+     *   version, titulo, secciones: [{ titulo, parrafos: [...] }]
+     * }
      */
+    function validarLiberacion(data) {
+        if (!data || typeof data !== 'object') {
+            throw new Error('liberacion-texto.json: no es un objeto válido.');
+        }
+        if (!Array.isArray(data.secciones) || data.secciones.length === 0) {
+            throw new Error('liberacion-texto.json: debe tener un array "secciones" con al menos 1 elemento.');
+        }
+        data.secciones.forEach((sec, i) => {
+            if (!sec.titulo || typeof sec.titulo !== 'string') {
+                throw new Error(`liberacion-texto.json: sección #${i} sin título.`);
+            }
+            if (!Array.isArray(sec.parrafos) || sec.parrafos.length === 0) {
+                throw new Error(`liberacion-texto.json: sección "${sec.titulo}" sin párrafos.`);
+            }
+            sec.parrafos.forEach((p, j) => {
+                if (typeof p !== 'string' || !p.trim()) {
+                    throw new Error(`liberacion-texto.json: sección "${sec.titulo}" párrafo #${j} vacío.`);
+                }
+            });
+        });
+    }
+
     function inscripcionesActivas() {
         const cfg = window.GC2.config;
         if (!cfg) return false;
@@ -129,11 +139,6 @@
         return true;
     }
 
-    /**
-     * Aplica la bandera de inscripciones al DOM:
-     *  - muestra/oculta el aviso de cerrado
-     *  - deshabilita el formulario si está cerrado
-     */
     function aplicarEstadoInscripciones() {
         const activas = inscripcionesActivas();
         window.GC2.inscripcionesActivas = activas;
@@ -153,15 +158,14 @@
         }
     }
 
-    /**
-     * Arranque: carga JSON, valida, calcula fechas y expone estado.
-     */
     async function init() {
         try {
             const config = await cargarJSON('data/config.json');
             validarConfig(config);
 
-            // Fechas derivadas útiles
+            const liberacion = await cargarJSON(config.liberacion.archivo);
+            validarLiberacion(liberacion);
+
             config._fechaTorneoDate = new Date(config.fechaTorneo + 'T00:00:00');
             config._fechaLimiteDate = config.fechaLimiteInscripcion
                 ? new Date(config.fechaLimiteInscripcion)
@@ -169,17 +173,19 @@
 
             window.GC2.config = config;
             window.GC2.precioFijo = Number(config.precioFijo);
+            window.GC2.liberacion = liberacion;
             window.GC2.listo = true;
 
-            // Aplicar estado de inscripciones
             aplicarEstadoInscripciones();
 
-            // Emitir evento
             document.dispatchEvent(new CustomEvent('gc2:config-listo', {
-                detail: { config }
+                detail: { config, liberacion }
             }));
 
             console.info('[GC2] Configuración cargada correctamente.');
+            console.info('[GC2] Torneo:', config.torneo, '| Fecha:', config.fechaTorneo);
+            console.info('[GC2] Liberación:', liberacion.secciones.length, 'secciones');
+
         } catch (err) {
             window.GC2.error = err;
             console.error('[GC2] Error al inicializar:', err);
@@ -190,17 +196,12 @@
         }
     }
 
-    /**
-     * Muestra un mensaje de error visible si la config no se puede cargar.
-     * @param {Error} err
-     */
     function mostrarErrorFatal(err) {
         const main = document.getElementById('vista-formulario-adultos');
         if (!main) return;
         const wrap = main.querySelector('.formulario-wrap');
         if (!wrap) return;
 
-        // Evitar duplicar el aviso
         if (wrap.querySelector('.aviso-fatal-gc2')) return;
 
         const box = document.createElement('div');
@@ -209,14 +210,13 @@
         box.innerHTML = `
       <strong>No se pudo cargar la configuración del módulo.</strong><br />
       ${window.GC2.utils.escaparHTML(err.message)}<br /><br />
-      <small>Revisa que <code>data/config.json</code> sea JSON válido, que
-      <code>precioFijo</code> sea un número mayor a 0, y que <code>backend.url</code>
-      apunte al Web App real de Apps Script.</small>
+      <small>Revisa que <code>data/config.json</code> y <code>data/liberacion-texto.json</code>
+      sean JSON válidos, que <code>precioFijo</code> sea un número mayor a 0, y que
+      <code>backend.url</code> apunte al Web App real de Apps Script.</small>
     `;
         wrap.prepend(box);
     }
 
-    // Arrancar cuando el DOM esté listo
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', init);
     } else {

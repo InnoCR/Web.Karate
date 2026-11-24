@@ -1,15 +1,15 @@
 {
-    "modulo": "peleas-acordadas",
-    "titulo": "Peleas Acordadas",
+    "modulo": "peleas-pactadas",
+    "titulo": "Peleas Pactadas",
     "subtitulo": "Registro exclusivo para adultos (18+)",
-    "torneo": "Guana-Cup 2026",
+    "torneo": "Guana-Cup 2027",
     "organizacion": "International Budokai Union - Kyokushin",
-    "fechaTorneo": "2026-12-05",
+    "fechaTorneo": "2027-02-20",
     "horaInicio": null,
-    "fechaLimiteInscripcion": "2026-11-28T23:59:59",
+    "fechaLimiteInscripcion": "2027-02-01T23:59:59",
     "inscripcionesAbiertas": true,
     "logo": "../assets/img/logo-ibu.png",
-    "poster": "../assets/img/poster.jpg",
+    "poster": "../assets/img/afiche2.jpg",
     "moneda": "CRC",
     "simboloMoneda": "₡",
     "locale": "es-CR",
@@ -27,10 +27,16 @@
         "edadMinima": 18,
         "edadMaxima": 99,
         "requiereTutor": false,
-        "requiereLiberacion": false,
-        "requiereCategorias": false
+        "requiereLiberacion": true,
+        "requiereFirmaDibujada": true
+    },
+    "liberacion": {
+        "archivo": "data/liberacion-texto.json",
+        "version": "v1.0-2027",
+        "requiereFirma": true,
+        "requiereFirmaDibujada": true
     },
     "whatsapp": {
-        "mensajeIntro": "🥋 *Pelea Acordada - Guana-Cup 2026*\n\nHola, soy {nombre}.\nFolio: *{folio}*\n*Total a pagar: {simbolo}{monto}*\n\nQuisiera coordinar el pago por SINPE Móvil y los detalles del combate."
+        "mensajeIntro": "🥋 *Pelea Pactada - Guana-Cup 2027*\n\nHola, soy {nombre}.\nFolio: *{folio}*\n*Total a pagar: {simbolo}{monto}*\n\nQuisiera coordinar el pago por SINPE Móvil y los detalles del combate.\n\n📎 *Adjunto mi liberación de responsabilidad firmada (PDF).*"
     }
 }

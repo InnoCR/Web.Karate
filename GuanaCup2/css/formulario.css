@@ -1,7 +1,8 @@
 /* =========================================================
-   GUANACOP2 · formulario.css
-   Estilos del formulario de 2 pasos (competidor, resumen):
-   header, progreso, inputs, fecha 3 selects, resumen, nav
+   GUANACUP2 · formulario.css
+   Estilos del formulario de 3 pasos (competidor, liberación,
+   resumen): header, progreso, inputs, fecha 3 selects,
+   liberación con scroll, canvas de firma, resumen, nav
    ========================================================= */
 
 /* ------------------------------
@@ -41,7 +42,7 @@
 }
 
 /* ------------------------------
-   2. BARRA DE PROGRESO (2 pasos)
+   2. BARRA DE PROGRESO (3 pasos)
    ------------------------------ */
 .progress-wrap {
     margin-bottom: var(--space-lg);
@@ -65,8 +66,8 @@
 
 .progress-steps {
     display: flex;
-    justify-content: space-around;
-    gap: var(--space-sm);
+    justify-content: space-between;
+    gap: .25rem;
 }
 
 .progress-steps .step {
@@ -74,9 +75,9 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: .3rem;
+    gap: .25rem;
     font-family: var(--font-display);
-    font-size: .8rem;
+    font-size: .7rem;
     text-transform: uppercase;
     letter-spacing: .04em;
     color: var(--color-text-dim);
@@ -88,12 +89,12 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 32px;
-    height: 32px;
+    width: 30px;
+    height: 30px;
     border-radius: 50%;
     background: var(--color-surface-2);
     border: 2px solid var(--color-border);
-    font-size: .9rem;
+    font-size: .85rem;
     font-weight: 700;
     transition: all var(--t-fast);
 }
@@ -112,8 +113,8 @@
 @media (min-width: 600px) {
     .progress-steps .step {
         flex-direction: row;
-        gap: .5rem;
-        font-size: .9rem;
+        gap: .45rem;
+        font-size: .82rem;
     }
 }
 
@@ -201,10 +202,12 @@
     box-shadow: 0 0 0 3px rgba(212, 175, 55, .15);
 }
 
-.campo input:read-only {
+.campo input:read-only,
+.campo input:disabled {
     background: var(--color-surface-2);
-    color: var(--color-text-muted);
+    color: var(--color-gold);
     cursor: not-allowed;
+    border-style: dashed;
 }
 
 .campo input::placeholder,
@@ -295,13 +298,11 @@
     color: var(--color-text-dim);
 }
 
-/* Cuando el campo padre está inválido */
 .campo.invalido .fecha-selects select {
     border-color: var(--color-error);
     box-shadow: 0 0 0 3px rgba(255, 77, 77, .12);
 }
 
-/* En pantallas muy chicas, mantener 3 columnas pero más compactas */
 @media (max-width: 420px) {
     .fecha-selects {
         grid-template-columns: 1fr 1.4fr 1fr;
@@ -347,7 +348,217 @@
 }
 
 /* ------------------------------
-   7. RESUMEN (PASO 2)
+   7. LIBERACIÓN DE RESPONSABILIDAD
+   ------------------------------ */
+.liberacion-texto {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: var(--space-md);
+    margin-bottom: var(--space-md);
+    max-height: 340px;
+    overflow-y: auto;
+    font-size: .88rem;
+    line-height: 1.65;
+    color: var(--color-text);
+    scroll-behavior: smooth;
+}
+
+.liberacion-texto .loading {
+    text-align: center;
+    color: var(--color-text-muted);
+    font-style: italic;
+    margin: 0;
+    padding: var(--space-md) 0;
+}
+
+.liberacion-texto .error {
+    color: var(--color-error);
+    text-align: center;
+    margin: 0;
+}
+
+.liberacion-titulo {
+    font-family: var(--font-display);
+    font-size: 1rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    color: var(--color-gold);
+    margin-bottom: .35rem;
+    padding-bottom: .5rem;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.liberacion-version {
+    font-size: .72rem;
+    color: var(--color-text-dim);
+    font-family: var(--font-display);
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    margin-bottom: var(--space-sm);
+}
+
+.liberacion-seccion-titulo {
+    font-family: var(--font-display);
+    font-size: .92rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    color: var(--color-gold);
+    margin: 1rem 0 .4rem;
+    padding-bottom: .25rem;
+}
+
+.liberacion-seccion-titulo:first-child {
+    margin-top: 0;
+}
+
+.liberacion-secciones p {
+    margin-bottom: .65rem;
+    text-align: justify;
+    color: var(--color-text);
+}
+
+.liberacion-secciones p:last-child {
+    margin-bottom: 0;
+}
+
+/* Scrollbar de la caja de liberación */
+.liberacion-texto::-webkit-scrollbar {
+    width: 8px;
+}
+
+.liberacion-texto::-webkit-scrollbar-track {
+    background: var(--color-surface-2);
+    border-radius: 4px;
+}
+
+.liberacion-texto::-webkit-scrollbar-thumb {
+    background: var(--color-border);
+    border-radius: 4px;
+}
+
+.liberacion-texto::-webkit-scrollbar-thumb:hover {
+    background: var(--color-primary-dark);
+}
+
+/* ------------------------------
+   8. CANVAS DE FIRMA
+   ------------------------------ */
+.firma-wrap {
+    position: relative;
+    background: #ffffff;
+    border: 2px dashed var(--color-border);
+    border-radius: var(--radius-md);
+    padding: .5rem;
+    transition: border-color var(--t-fast), box-shadow var(--t-fast);
+}
+
+.firma-wrap:focus-within {
+    border-color: var(--color-gold);
+}
+
+.firma-wrap.error {
+    border-color: var(--color-error);
+    box-shadow: 0 0 0 3px rgba(255, 77, 77, .15);
+    background: #fff5f5;
+}
+
+#ad_firmaCanvas {
+    display: block;
+    width: 100%;
+    height: 180px;
+    background: #ffffff;
+    border-radius: var(--radius-sm);
+    cursor: crosshair;
+    touch-action: none;
+    /* evita scroll al dibujar en móvil */
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.firma-wrap .btn {
+    margin-top: .5rem;
+    width: 100%;
+}
+
+.firma-wrap .btn:hover {
+    background: rgba(255, 255, 255, .1);
+}
+
+@media (min-width: 560px) {
+    .firma-wrap .btn {
+        width: auto;
+        margin-top: .5rem;
+        margin-left: auto;
+        display: block;
+    }
+}
+
+/* En móvil el canvas puede ser un poco más alto para escribir cómodo */
+@media (max-width: 520px) {
+    #ad_firmaCanvas {
+        height: 200px;
+    }
+}
+
+/* ------------------------------
+   9. CHECK DE ACEPTACIÓN
+   ------------------------------ */
+.campo-check {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: .75rem;
+    padding: 1rem;
+    background: rgba(200, 16, 46, .06);
+    border: 1.5px solid var(--color-primary);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--space-md);
+    transition: all var(--t-fast);
+}
+
+.campo-check input[type="checkbox"] {
+    width: 22px;
+    height: 22px;
+    min-width: 22px;
+    margin-top: 2px;
+    accent-color: var(--color-primary);
+    cursor: pointer;
+}
+
+.campo-check label {
+    font-family: var(--font-body);
+    font-size: .92rem;
+    color: var(--color-text);
+    line-height: 1.5;
+    cursor: pointer;
+    text-transform: none;
+    letter-spacing: normal;
+    font-weight: 400;
+    flex: 1;
+}
+
+.campo-check .error-msg {
+    display: none;
+    color: var(--color-error);
+    font-size: .8rem;
+    width: 100%;
+    flex-basis: 100%;
+}
+
+.campo-check.invalido {
+    border-color: var(--color-error);
+    background: rgba(255, 77, 77, .06);
+}
+
+.campo-check.invalido .error-msg {
+    display: block;
+}
+
+/* ------------------------------
+   10. RESUMEN (PASO 3)
    ------------------------------ */
 .resumen {
     background: var(--color-surface);
@@ -406,7 +617,7 @@
 }
 
 /* ------------------------------
-   8. NAVEGACIÓN DEL FORMULARIO
+   11. NAVEGACIÓN DEL FORMULARIO
    ------------------------------ */
 .form-nav {
     display: flex;
@@ -427,19 +638,25 @@
 @media (min-width: 600px) {
     .form-nav .btn {
         flex: 0 1 auto;
-        min-width: 180px;
+        min-width: 170px;
     }
 }
 
 /* ------------------------------
-   9. ACCESIBILIDAD
+   12. ACCESIBILIDAD
    ------------------------------ */
 @media (prefers-reduced-motion: reduce) {
 
     .paso,
     .progress-fill,
-    .fecha-selects select {
+    .fecha-selects select,
+    .campo-check,
+    .firma-wrap {
         animation: none;
         transition: none;
+    }
+
+    .liberacion-texto {
+        scroll-behavior: auto;
     }
 }
