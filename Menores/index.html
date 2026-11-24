@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Inscripción menores | Guana-Cup 2027</title>
+<link rel="icon" href="../assets/img/favicon.ico" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="css/styles.css" />
+<link rel="stylesheet" href="css/base.css" />
+<link rel="stylesheet" href="css/formulario.css" />
+<link rel="stylesheet" href="css/confirmacion.css" />
+</head>
+<body>
+<header class="gc2-header">
+<div class="container gc2-header-inner">
+<a href="../index.html" class="gc2-brand"><img src="../assets/img/logo-ibu.png" alt="IBU Kyokushin" class="gc2-logo" /><span>Guana-Cup 2027 · Menores</span></a>
+<a href="../index.html" class="gc2-back">← Volver al torneo</a>
+</div>
+</header>
+<main id="vista-formulario" class="vista vista-activa">
+
+        <div class="container formulario-wrap">
+
+            <header class="formulario-header">
+                <h1>Inscripción al Torneo</h1>
+                <p>Guana-Cup 2027 · 20 de febrero</p>
+            </header>
+
+            <!-- Barra de progreso (4 pasos) -->
+            <div class="progress-wrap" aria-label="Progreso de inscripción">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill" style="width: 25%"></div>
+                </div>
+                <ol class="progress-steps">
+                    <li class="step active" data-step="1"><span>1</span> Competidor</li>
+                    <li class="step" data-step="2"><span>2</span> Tutor</li>
+                    <li class="step" data-step="3"><span>3</span> Liberación</li>
+                    <li class="step" data-step="4"><span>4</span> Resumen</li>
+                </ol>
+            </div>
+
+            <form id="formInscripcion" novalidate>
+
+                <!-- PASO 1: DATOS DEL COMPETIDOR -->
+                <fieldset class="paso activo" data-paso="1">
+                    <legend>Datos del competidor</legend>
+
+                    <div class="campo">
+                        <label for="nombreCompleto">Nombre completo *</label>
+                        <input type="text" id="nombreCompleto" name="nombreCompleto"
+                            placeholder="Ej: Juan Pérez Rodríguez" required />
+                        <small class="error-msg"></small>
+                    </div>
+
+                    <div class="campo">
+                        <label>Fecha de nacimiento *</label>
+                        <div class="fecha-nacimiento">
+                            <select id="diaNacimiento" name="diaNacimiento" required>
+                                <option value="">Día</option>
+                            </select>
+                            <select id="mesNacimiento" name="mesNacimiento" required>
+                                <option value="">Mes</option>
+                            </select>
+                            <select id="anioNacimiento" name="anioNacimiento" required>
+                                <option value="">Año</option>
+                            </select>
+                        </div>
+                        <small class="error-msg"></small>
+                        <small class="hint">Selecciona día, mes y año</small>
+                    </div>
+
+                    <div class="campo-row">
+                        <div class="campo">
+                            <label>Edad al torneo</label>
+                            <input type="text" id="edadCalculada" name="edadCalculada" readonly />
+                            <small class="hint">Se calcula automáticamente al 20/02/2027</small>
+                        </div>
+                        <div class="campo">
+                            <label for="sexo">Sexo *</label>
+                            <select id="sexo" name="sexo" required>
+                                <option value="">Seleccione…</option>
+                                <option value="M">Masculino</option>
+                                <option value="F">Femenino</option>
+                            </select>
+                            <small class="error-msg"></small>
+                        </div>
+                    </div>
+
+                    <div class="campo-row">
+                        <div class="campo">
+                            <label for="identificacion">
+                                Identificación <span class="hint-inline">(opcional)</span>
+                            </label>
+                            <input type="text" id="identificacion" name="identificacion" placeholder="Ej: 123456789" />
+                            <small class="error-msg"></small>
+                        </div>
+                        <div class="campo">
+                            <label for="telefono">Teléfono *</label>
+                            <input type="tel" id="telefono" name="telefono" placeholder="Ej: 8888-8888" required />
+                            <small class="error-msg"></small>
+                        </div>
+                    </div>
+
+                    <div class="campo-row">
+                        <div class="campo">
+                            <label for="email">
+                                Correo electrónico <span class="hint-inline">(opcional)</span>
+                            </label>
+                            <input type="email" id="email" name="email" placeholder="Ej: correo@ejemplo.com" />
+                            <small class="error-msg"></small>
+                        </div>
+                        <div class="campo">
+                            <label for="dojo">Dojo / Academia *</label>
+                            <input type="text" id="dojo" name="dojo" placeholder="Ej: Oyama Ryu" required />
+                            <small class="error-msg"></small>
+                        </div>
+                    </div>
+
+                    <div class="campo-row">
+                        <div class="campo">
+                            <label for="sensei">Sensei / Instructor</label>
+                            <input type="text" id="sensei" name="sensei" placeholder="Ej: Sensei Carlos" />
+                        </div>
+                        <div class="campo">
+                            <label for="grado">Grado (cinturón) *</label>
+                            <select id="grado" name="grado" required>
+                                <option value="">Seleccione…</option>
+                                <option value="Blanco (Mukyu / Sin grado)">Blanco (Mukyu / Sin grado)</option>
+                                <option value="10º Kyu - Naranja">10º Kyu - Naranja</option>
+                                <option value="9º Kyu - Naranja con raya">9º Kyu - Naranja con raya</option>
+                                <option value="8º Kyu - Azul">8º Kyu - Azul</option>
+                                <option value="7º Kyu - Azul con raya">7º Kyu - Azul con raya</option>
+                                <option value="6º Kyu - Amarillo">6º Kyu - Amarillo</option>
+                                <option value="5º Kyu - Amarillo con raya">5º Kyu - Amarillo con raya</option>
+                                <option value="4º Kyu - Verde">4º Kyu - Verde</option>
+                                <option value="3º Kyu - Verde con raya">3º Kyu - Verde con raya</option>
+                                <option value="2º Kyu - Marrón">2º Kyu - Marrón</option>
+                                <option value="1º Kyu - Marrón con raya">1º Kyu - Marrón con raya</option>
+                                <option value="1º Dan - Negro">1º Dan - Negro</option>
+                                <option value="2º Dan - Negro">2º Dan - Negro</option>
+                                <option value="3º Dan - Negro">3º Dan - Negro</option>
+                                <option value="4º Dan - Negro">4º Dan - Negro</option>
+                                <option value="5º Dan - Negro">5º Dan - Negro</option>
+                            </select>
+                            <small class="error-msg"></small>
+                        </div>
+                    </div>
+
+                    <div class="campo-row">
+                        <div class="campo">
+                            <label for="peso">Peso (kg) *</label>
+                            <input type="number" id="peso" name="peso" placeholder="Ej: 55" step="0.1" required />
+                            <small class="error-msg"></small>
+                        </div>
+                        <div class="campo">
+                            <label for="altura">Altura (cm) *</label>
+                            <input type="number" id="altura" name="altura" placeholder="Ej: 170" step="1" required />
+                            <small class="error-msg"></small>
+                        </div>
+                    </div>
+
+                    <div class="campo">
+                        <label for="condiciones">Condiciones médicas o alergias (opcional)</label>
+                        <textarea id="condiciones" name="condiciones" rows="2"
+                            placeholder="Ej: Asma, alergia a algún medicamento…"></textarea>
+                    </div>
+
+                    <div class="aviso-menor" id="avisoMenor">
+                        ⚠️ Todos los competidores son menores de edad, se solicitarán los datos del tutor responsable.
+                    </div>
+                </fieldset>
+
+                <!-- PASO 2: DATOS DEL TUTOR -->
+                <fieldset class="paso" data-paso="2" id="pasoTutor">
+                    <legend>Datos del tutor responsable</legend>
+                    <p class="paso-desc">Obligatorio para todos los competidores menores de 18 años.</p>
+
+                    <div class="campo">
+                        <label for="tutorNombre">Nombre completo del tutor *</label>
+                        <input type="text" id="tutorNombre" name="tutorNombre"
+                            placeholder="Ej: María Rodríguez Solís" />
+                        <small class="error-msg"></small>
+                    </div>
+
+                    <div class="campo-row">
+                        <div class="campo">
+                            <label for="tutorParentesco">Parentesco *</label>
+                            <input type="text" id="tutorParentesco" name="tutorParentesco"
+                                placeholder="Ej: Madre, Padre, Encargado legal" />
+                            <small class="error-msg"></small>
+                        </div>
+                        <div class="campo">
+                            <label for="tutorIdentificacion">Identificación del tutor *</label>
+                            <input type="text" id="tutorIdentificacion" name="tutorIdentificacion"
+                                placeholder="Ej: 123456789" />
+                            <small class="error-msg"></small>
+                        </div>
+                    </div>
+
+                    <div class="campo-row">
+                        <div class="campo">
+                            <label for="tutorTelefono">Teléfono del tutor *</label>
+                            <input type="tel" id="tutorTelefono" name="tutorTelefono" placeholder="Ej: 8888-8888" />
+                            <small class="error-msg"></small>
+                        </div>
+                        <div class="campo">
+                            <label for="tutorEmail">Correo del tutor *</label>
+                            <input type="email" id="tutorEmail" name="tutorEmail"
+                                placeholder="Ej: correo@ejemplo.com" />
+                            <small class="error-msg"></small>
+                        </div>
+                    </div>
+                </fieldset>
+
+                <!-- PASO 3: LIBERACIÓN DE RESPONSABILIDAD -->
+                <fieldset class="paso" data-paso="3">
+                    <legend>Liberación de responsabilidad</legend>
+                    <p class="paso-desc">
+                        Lee el texto completo, completa los datos, dibuja tu firma y acepta para continuar.
+                    </p>
+
+                    <div class="liberacion-texto" id="liberacionTexto">
+                        <!-- Se genera por JS -->
+                    </div>
+
+                    <div class="campo">
+                        <label for="firmaNombre">Nombre completo de quien firma *</label>
+                        <input type="text" id="firmaNombre" name="firmaNombre" placeholder="Ej: María Rodríguez Solís"
+                            required />
+                        <small class="error-msg"></small>
+                    </div>
+
+                    <div class="campo-row">
+                        <div class="campo">
+                            <label for="firmaIdentificacion">Identificación de quien firma *</label>
+                            <input type="text" id="firmaIdentificacion" name="firmaIdentificacion"
+                                placeholder="Ej: 123456789" required />
+                            <small class="error-msg"></small>
+                        </div>
+                        <div class="campo">
+                            <label for="firmaParentesco">Parentesco *</label>
+                            <input type="text" id="firmaParentesco" name="firmaParentesco"
+                                placeholder="Ej: Madre, Padre, Encargado legal" />
+                            <small class="error-msg"></small>
+                        </div>
+                    </div>
+
+                    <div class="campo">
+                        <label>Firma digital *</label>
+                        <div class="firma-wrap" id="firmaWrap">
+                            <canvas id="firmaCanvas" width="600" height="200"></canvas>
+                            <button type="button" class="btn btn-ghost btn-sm" id="btnLimpiarFirma">
+                                Limpiar firma
+                            </button>
+                        </div>
+                        <small class="hint">Dibuja tu firma con el dedo o el mouse</small>
+                        <small class="error-msg" id="firmaError"></small>
+                    </div>
+
+                    <div class="campo-check">
+                        <input type="checkbox" id="aceptoLiberacion" name="aceptoLiberacion" required />
+                        <label for="aceptoLiberacion">
+                            He leído y acepto los términos de la liberación de responsabilidad. *
+                        </label>
+                        <small class="error-msg"></small>
+                    </div>
+                </fieldset>
+
+                <!-- PASO 4: RESUMEN -->
+                <fieldset class="paso" data-paso="4">
+                    <legend>Resumen de la inscripción</legend>
+                    <div class="resumen" id="resumenInscripcion">
+                        <!-- Se genera por JS -->
+                    </div>
+                </fieldset>
+
+                <!-- NAVEGACIÓN -->
+                <div class="form-nav">
+                    <button type="button" class="btn btn-outline" id="btnAnterior" disabled>
+                        ← Anterior
+                    </button>
+                    <button type="button" class="btn btn-primary" id="btnSiguiente">
+                        Siguiente →
+                    </button>
+                    <button type="button" class="btn btn-success" id="btnConfirmar" hidden>
+                        ✔ Confirmar inscripción
+                    </button>
+                </div>
+
+            </form>
+        </div>
+    </main>
+
+    <!-- ============================================= -->
+    <!-- VISTA 2: CONFIRMACIÓN (SIMPLIFICADA)           -->
+    <!-- ============================================= -->
+    <main id="vista-confirmacion" class="vista">
+        <div class="container confirmacion-wrap">
+
+            <div class="confirmacion-icon">✅</div>
+
+            <h1 id="confirmacionTitulo">¡Inscripción registrada!</h1>
+            <p class="confirmacion-sub">Guarda tu folio para cualquier consulta.</p>
+
+            <!-- Folio de [Nombre] -->
+            <div class="folio-box">
+                <span id="folioLabel">Folio</span>
+                <strong id="folioTexto">GC2027-0000</strong>
+            </div>
+
+            <!-- SINPE con monto -->
+            <div class="sinpe-box">
+                <h3>Pago por SINPE Móvil</h3>
+                <p>
+                    Número: <strong id="sinpeNumero">6054-5660</strong><br />
+                    Titular: <strong id="sinpeTitular">Claudio Medrano</strong>
+                </p>
+                <p class="sinpe-monto">
+                    Monto: <strong id="sinpeMonto">₡15.000</strong>
+                </p>
+            </div>
+
+            <div class="confirmacion-acciones">
+                <button class="btn btn-outline btn-lg" id="btnDescargarLiberacion">
+                    📄 Descargar liberación de nuevo
+                </button>
+                <button class="btn btn-primary btn-lg" id="btnEnviarWhatsapp">
+                    💬 Coordinar pago por WhatsApp
+                </button>
+            </div>
+
+            <p class="confirmacion-nota">
+                <strong>Importante:</strong> tu liberación de responsabilidad se descargó automáticamente.
+                Adjúntala en WhatsApp junto con el mensaje.
+            </p>
+
+            <a class="btn btn-ghost" href="../index.html">← Volver al inicio</a>
+        </div>
+    </main>
+<footer class="gc2-footer"><div class="container"><p>© 2027 Guana-Cup · International Budokai Union Kyokushin</p></div></footer>
+<div class="modal-espera" id="modalEspera" role="dialog" aria-modal="true" aria-labelledby="modalEsperaTitulo" aria-describedby="modalEsperaTexto" hidden>
+    <div class="modal-espera-contenido">
+        <span class="modal-espera-spinner" aria-hidden="true"></span>
+        <h2 id="modalEsperaTitulo">Enviando inscripción</h2>
+        <p id="modalEsperaTexto">Estamos guardando tus datos. Por favor, espera y no cierres esta página.</p>
+    </div>
+</div>
+<div class="modal" id="modalLiberacion" hidden>
+<div class="modal-backdrop" data-close-modal></div>
+<div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="modalTitulo">
+<header class="modal-header"><h2 id="modalTitulo">Liberación de responsabilidad</h2><button class="modal-close" data-close-modal aria-label="Cerrar">×</button></header>
+<div class="modal-body" id="modalLiberacionBody"></div>
+<footer class="modal-footer"><button class="btn btn-primary" data-close-modal>Entendido</button></footer>
+</div>
+</div>
+<script src="../libs/jspdf.umd.min.js"></script>
+<script src="../data/config.js"></script>
+<script src="data/config.js"></script>
+<script src="js/config.js"></script>
+<script src="js/navegacion.js"></script>
+<script src="js/liberacion.js"></script>
+<script src="js/pdf.js"></script>
+<script src="js/whatsapp.js"></script>
+<script src="js/formulario.js"></script>
+</body>
+</html>

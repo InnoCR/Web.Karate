@@ -19,7 +19,6 @@
         ultimoPunto: null,
         anchoCSS: 0,
         altoCSS: 0,
-        version: null,
         fechaAceptacion: null
     };
 
@@ -48,10 +47,6 @@
         if (data.titulo) {
             html += `<h3 class="liberacion-titulo">${esc(data.titulo)}</h3>`;
         }
-        if (data.version) {
-            html += `<p class="liberacion-version">Versión: ${esc(data.version)}</p>`;
-        }
-
         html += '<div class="liberacion-secciones">';
         data.secciones.forEach((sec) => {
             html += `<h4 class="liberacion-seccion-titulo">${esc(sec.titulo)}</h4>`;
@@ -62,8 +57,6 @@
         html += '</div>';
 
         contenedorTexto.innerHTML = html;
-
-        firma.version = data.version || 'v1.0-2027';
 
         console.info('[GC2] Texto de liberación renderizado:', data.secciones.length, 'secciones');
     }
@@ -141,7 +134,11 @@
     }
 
     function getPos(e) {
-        return { x: e.offsetX, y: e.offsetY };
+        const rect = firma.canvas.getBoundingClientRect();
+        return {
+            x: e.clientX - rect.left,
+            y: e.clientY - rect.top
+        };
     }
 
     function iniciarTrazo(e) {
@@ -317,7 +314,6 @@
             identificacion: inputIdentificacion ? inputIdentificacion.value.trim() : '',
             acepto: checkAcepto ? checkAcepto.checked : false,
             fechaAceptacion: firma.fechaAceptacion || new Date().toISOString(),
-            version: firma.version || 'v1.0-2027',
             firmaImagen: obtenerFirmaDataURL()
         };
     }

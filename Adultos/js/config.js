@@ -1,6 +1,6 @@
 /* =========================================================
    GUANACUP2 · config.js
-   Carga config.json y liberacion-texto.json, calcula fechas
+   Carga las constantes compartida, específica y de liberación, calcula fechas
    derivadas y expone todo en window.GC2
    ========================================================= */
 
@@ -57,14 +57,6 @@
         }
     };
 
-    async function cargarJSON(url) {
-        const res = await fetch(url, { cache: 'no-store' });
-        if (!res.ok) {
-            throw new Error(`No se pudo cargar ${url} (HTTP ${res.status})`);
-        }
-        return res.json();
-    }
-
     function validarConfig(cfg) {
         const requeridos = [
             'torneo',
@@ -74,55 +66,53 @@
         ];
         const faltantes = requeridos.filter((k) => cfg[k] == null || cfg[k] === '');
         if (faltantes.length) {
-            throw new Error(`config.json: faltan campos requeridos → ${faltantes.join(', ')}`);
+            throw new Error(`Configuración de adultos: faltan campos requeridos → ${faltantes.join(', ')}`);
         }
 
         if (cfg.precioFijo == null || isNaN(Number(cfg.precioFijo)) || Number(cfg.precioFijo) <= 0) {
-            throw new Error('config.json: "precioFijo" debe ser un número mayor a 0.');
+            throw new Error('Configuración de adultos: "precioFijo" debe ser un número mayor a 0.');
         }
 
         if (!cfg.liberacion || !cfg.liberacion.archivo) {
-            throw new Error('config.json: falta la sección "liberacion.archivo".');
+            throw new Error('Configuración adultos: falta la sección "liberacion".');
         }
 
         if (!cfg.backend || typeof cfg.backend !== 'object') {
-            throw new Error('config.json: falta la sección "backend".');
+            throw new Error('Configuración adultos: falta la sección "backend".');
         }
         const url = String(cfg.backend.url || '').trim();
         if (!url) {
-            throw new Error('config.json: backend.url está vacía.');
+            throw new Error('Configuración adultos: backend.url está vacía.');
         }
         if (url.includes('TU_DEPLOY_ID')) {
-            throw new Error('config.json: debes reemplazar "TU_DEPLOY_ID_AQUI" por la URL real del Web App de Apps Script.');
+            throw new Error('Configuración adultos: debes reemplazar la URL de ejemplo por la URL real del Web App de Apps Script.');
         }
         if (!/^https:\/\/script\.google\.com\/macros\/s\/[^/]+\/exec/.test(url)) {
-            throw new Error('config.json: backend.url no parece una URL válida de Apps Script.');
+            throw new Error('Configuración adultos: backend.url no parece una URL válida de Apps Script.');
         }
     }
 
     /**
-     * Valida la nueva estructura de liberacion-texto.json:
-     * {
-     *   version, titulo, secciones: [{ titulo, parrafos: [...] }]
-     * }
+     * Valida la estructura de la constante de liberación:
+     * { titulo, secciones: [{ titulo, parrafos: [...] }] }
      */
     function validarLiberacion(data) {
         if (!data || typeof data !== 'object') {
-            throw new Error('liberacion-texto.json: no es un objeto válido.');
+            throw new Error('Liberación adultos: no es un objeto válido.');
         }
         if (!Array.isArray(data.secciones) || data.secciones.length === 0) {
-            throw new Error('liberacion-texto.json: debe tener un array "secciones" con al menos 1 elemento.');
+            throw new Error('Liberación adultos: debe tener un array "secciones" con al menos 1 elemento.');
         }
         data.secciones.forEach((sec, i) => {
             if (!sec.titulo || typeof sec.titulo !== 'string') {
-                throw new Error(`liberacion-texto.json: sección #${i} sin título.`);
+                throw new Error(`Liberación adultos: sección #${i} sin título.`);
             }
             if (!Array.isArray(sec.parrafos) || sec.parrafos.length === 0) {
-                throw new Error(`liberacion-texto.json: sección "${sec.titulo}" sin párrafos.`);
+                throw new Error(`Liberación adultos: sección "${sec.titulo}" sin párrafos.`);
             }
             sec.parrafos.forEach((p, j) => {
                 if (typeof p !== 'string' || !p.trim()) {
-                    throw new Error(`liberacion-texto.json: sección "${sec.titulo}" párrafo #${j} vacío.`);
+                    throw new Error(`Liberación adultos: sección "${sec.titulo}" párrafo #${j} vacío.`);
                 }
             });
         });
@@ -158,12 +148,16 @@
         }
     }
 
-    async function init() {
+    function init() {
         try {
-            const config = await cargarJSON('data/config.json');
+            const compartida = window.TORNEO_CONFIG;
+            const especifica = window.ADULTOS_CONFIG;
+            const liberacion = window.ADULTOS_LIBERACION;
+            if (!compartida || !especifica || !liberacion) {
+                throw new Error('Falta la configuración compartida, específica o la liberación de adultos.');
+            }
+            const config = Object.assign({}, compartida, especifica);
             validarConfig(config);
-
-            const liberacion = await cargarJSON(config.liberacion.archivo);
             validarLiberacion(liberacion);
 
             config._fechaTorneoDate = new Date(config.fechaTorneo + 'T00:00:00');
@@ -210,8 +204,8 @@
         box.innerHTML = `
       <strong>No se pudo cargar la configuración del módulo.</strong><br />
       ${window.GC2.utils.escaparHTML(err.message)}<br /><br />
-      <small>Revisa que <code>data/config.json</code> y <code>data/liberacion-texto.json</code>
-      sean JSON válidos, que <code>precioFijo</code> sea un número mayor a 0, y que
+      <small>Revisa que <code>data/config.js</code> y <code>data/liberacion-texto.js</code>
+      estén cargados, que <code>precioFijo</code> sea un número mayor a 0, y que
       <code>backend.url</code> apunte al Web App real de Apps Script.</small>
     `;
         wrap.prepend(box);

@@ -1,0 +1,410 @@
+/* =========================================================
+   GUANACOP2 · base.css
+   Reset + variables + tipografía + botones + header/footer
+   ========================================================= */
+
+/* ------------------------------
+   1. VARIABLES
+   ------------------------------ */
+:root {
+    /* Colores (mismos del sitio principal) */
+    --color-bg: #0a0a0a;
+    --color-bg-alt: #111111;
+    --color-surface: #161616;
+    --color-surface-2: #1d1d1d;
+    --color-border: #2a2a2a;
+
+    --color-primary: #c8102e;
+    --color-primary-dark: #8f0a20;
+    --color-primary-light: #e63946;
+
+    --color-gold: #d4af37;
+    --color-gold-light: #f2d675;
+
+    --color-text: #f5f5f5;
+    --color-text-muted: #a8a8a8;
+    --color-text-dim: #6e6e6e;
+
+    --color-success: #2ecc71;
+    --color-error: #ff4d4d;
+    --color-warning: #f1c40f;
+
+    /* Tipografía */
+    --font-display: 'Oswald', 'Arial Narrow', sans-serif;
+    --font-body: 'Inter', system-ui, -apple-system, sans-serif;
+
+    /* Radios */
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 16px;
+
+    /* Sombras */
+    --shadow-sm: 0 2px 6px rgba(0, 0, 0, .35);
+    --shadow-md: 0 6px 18px rgba(0, 0, 0, .45);
+    --shadow-lg: 0 12px 40px rgba(0, 0, 0, .55);
+    --shadow-red: 0 6px 24px rgba(200, 16, 46, .35);
+
+    /* Espaciado */
+    --space-xs: .5rem;
+    --space-sm: 1rem;
+    --space-md: 1.5rem;
+    --space-lg: 2.5rem;
+    --space-xl: 4rem;
+
+    /* Layout */
+    --container-max: 900px;
+
+    /* Transiciones */
+    --t-fast: .15s ease;
+    --t-med: .3s ease;
+    --t-slow: .5s ease;
+}
+
+/* ------------------------------
+   2. RESET
+   ------------------------------ */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+}
+
+body {
+    font-family: var(--font-body);
+    background-color: var(--color-bg);
+    color: var(--color-text);
+    line-height: 1.6;
+    font-size: 16px;
+    min-height: 100vh;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+img,
+picture,
+video,
+canvas,
+svg {
+    display: block;
+    max-width: 100%;
+    height: auto;
+}
+
+input,
+button,
+textarea,
+select {
+    font: inherit;
+    color: inherit;
+}
+
+button {
+    cursor: pointer;
+    background: none;
+    border: none;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+ul,
+ol {
+    list-style: none;
+}
+
+/* ------------------------------
+   3. TIPOGRAFÍA
+   ------------------------------ */
+h1,
+h2,
+h3,
+h4 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    letter-spacing: .02em;
+    line-height: 1.15;
+    text-transform: uppercase;
+}
+
+h1 {
+    font-size: clamp(1.75rem, 4.5vw, 2.75rem);
+}
+
+h2 {
+    font-size: clamp(1.4rem, 3.2vw, 2rem);
+}
+
+h3 {
+    font-size: clamp(1.05rem, 2vw, 1.25rem);
+}
+
+p {
+    color: var(--color-text);
+}
+
+::selection {
+    background: var(--color-primary);
+    color: #fff;
+}
+
+/* ------------------------------
+   4. LAYOUT / CONTAINER
+   ------------------------------ */
+.container {
+    width: 100%;
+    max-width: var(--container-max);
+    margin: 0 auto;
+    padding: 0 1rem;
+}
+
+@media (min-width: 768px) {
+    .container {
+        padding: 0 1.5rem;
+    }
+}
+
+/* Sistema de vistas */
+.vista {
+    display: none;
+    animation: fadeIn var(--t-med);
+}
+
+.vista.vista-activa {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ------------------------------
+   5. BOTONES
+   ------------------------------ */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: .5rem;
+    padding: .75rem 1.5rem;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    border-radius: var(--radius-sm);
+    border: 2px solid transparent;
+    transition: all var(--t-fast);
+    text-align: center;
+    white-space: nowrap;
+    user-select: none;
+}
+
+.btn:disabled,
+.btn[disabled] {
+    opacity: .5;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.btn-primary {
+    background: var(--color-primary);
+    color: #fff;
+    border-color: var(--color-primary);
+    box-shadow: var(--shadow-red);
+}
+
+.btn-primary:hover:not(:disabled) {
+    background: var(--color-primary-dark);
+    border-color: var(--color-primary-dark);
+    transform: translateY(-2px);
+}
+
+.btn-primary:active {
+    transform: translateY(0);
+}
+
+.btn-outline {
+    background: transparent;
+    color: var(--color-text);
+    border-color: var(--color-border);
+}
+
+.btn-outline:hover:not(:disabled) {
+    border-color: var(--color-gold);
+    color: var(--color-gold);
+}
+
+.btn-success {
+    background: var(--color-success);
+    color: #062e17;
+    border-color: var(--color-success);
+}
+
+.btn-success:hover:not(:disabled) {
+    filter: brightness(1.1);
+    transform: translateY(-2px);
+}
+
+.btn-ghost {
+    background: transparent;
+    color: var(--color-text-muted);
+    padding: .5rem 1rem;
+    font-size: .9rem;
+}
+
+.btn-ghost:hover {
+    color: var(--color-text);
+}
+
+.btn-sm {
+    padding: .45rem 1rem;
+    font-size: .85rem;
+}
+
+.btn-lg {
+    padding: 1rem 2rem;
+    font-size: 1.05rem;
+}
+
+/* ------------------------------
+   6. HEADER DEL MÓDULO
+   ------------------------------ */
+.gc2-header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(10, 10, 10, .92);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--color-border);
+}
+
+.gc2-header-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: .75rem;
+    padding-bottom: .75rem;
+    gap: 1rem;
+}
+
+.gc2-brand {
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+    font-family: var(--font-display);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    font-size: .9rem;
+    color: var(--color-text);
+}
+
+.gc2-logo {
+    width: 36px;
+    height: 36px;
+    object-fit: contain;
+}
+
+.gc2-back {
+    font-family: var(--font-display);
+    font-size: .8rem;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    color: var(--color-text-muted);
+    transition: color var(--t-fast);
+    white-space: nowrap;
+}
+
+.gc2-back:hover {
+    color: var(--color-gold);
+}
+
+/* Ocultar texto del brand en pantallas muy chicas */
+@media (max-width: 520px) {
+    .gc2-brand span {
+        display: none;
+    }
+}
+
+/* ------------------------------
+   7. FOOTER DEL MÓDULO
+   ------------------------------ */
+.gc2-footer {
+    background: var(--color-bg-alt);
+    border-top: 1px solid var(--color-border);
+    margin-top: var(--space-xl);
+    padding: var(--space-lg) 0;
+    text-align: center;
+    color: var(--color-text-muted);
+    font-size: .85rem;
+}
+
+/* ------------------------------
+   8. UTILIDADES
+   ------------------------------ */
+.loading {
+    text-align: center;
+    color: var(--color-text-muted);
+    padding: var(--space-lg) 0;
+    font-style: italic;
+}
+
+.oculto {
+    display: none !important;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.text-gold {
+    color: var(--color-gold);
+}
+
+.text-muted {
+    color: var(--color-text-muted);
+}
+
+/* Scrollbar sutil */
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--color-bg);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--color-border);
+    border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--color-primary-dark);
+}
+
+/* Focus accesible */
+:focus-visible {
+    outline: 2px solid var(--color-gold);
+    outline-offset: 2px;
+}

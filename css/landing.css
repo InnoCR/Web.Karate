@@ -420,3 +420,124 @@
 .cta-final p strong {
     color: var(--color-gold);
 }
+
+/* ------------------------------
+   6. SELECCIÓN DE INSCRIPCIÓN
+   ------------------------------ */
+.inscripcion-section {
+    padding: var(--space-xl) 0;
+    background:
+        radial-gradient(circle at 50% 50%, rgba(200, 16, 46, .16), transparent 65%),
+        linear-gradient(180deg, #0a0a0a 0%, #150505 100%);
+    border-top: 1px solid var(--color-border);
+}
+
+.inscripcion-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+    max-width: 900px;
+    margin: var(--space-lg) auto 0;
+}
+
+@media (min-width: 760px) {
+    .inscripcion-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+.inscripcion-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    min-height: 280px;
+    background: var(--color-surface);
+    border: 2px solid var(--color-primary);
+    border-radius: var(--radius-lg);
+    padding: 2rem 1.5rem;
+    box-shadow: 0 12px 40px rgba(200, 16, 46, .16);
+}
+
+.inscripcion-card-adultos {
+    border-color: var(--color-gold);
+    box-shadow: 0 12px 40px rgba(212, 175, 55, .12);
+}
+
+.inscripcion-card-principal {
+    border-width: 3px;
+    box-shadow:
+        0 16px 46px rgba(200, 16, 46, .22),
+        0 0 0 1px rgba(200, 16, 46, .18);
+}
+
+.inscripcion-etiqueta {
+    color: var(--color-gold);
+    font-family: var(--font-display);
+    text-transform: uppercase;
+    letter-spacing: .12em;
+    font-size: .78rem;
+    margin-bottom: .75rem;
+}
+
+.inscripcion-card h3 {
+    font-size: 1.65rem;
+    margin-bottom: .65rem;
+}
+
+.inscripcion-card p {
+    color: var(--color-text-muted);
+    max-width: 300px;
+    margin-bottom: 1rem;
+}
+
+.inscripcion-afiche {
+    width: 100%;
+    max-height: 220px;
+    object-fit: cover;
+    border-radius: var(--radius-md);
+    margin-bottom: 1.25rem;
+    border: 1px solid var(--color-border);
+}
+
+.inscripcion-precio {
+    color: #fff;
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    margin-top: auto;
+    margin-bottom: 1rem;
+}
+
+.inscripcion-boton {
+    width: 100%;
+    max-width: 330px;
+    min-height: 52px;
+}
+
+.btn-gold {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #171008;
+    background: linear-gradient(135deg, var(--color-gold-light), var(--color-gold));
+    border: 1px solid var(--color-gold-light);
+    border-radius: var(--radius-md);
+    font-family: var(--font-display);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    box-shadow: 0 8px 24px rgba(212, 175, 55, .18);
+    transition: transform var(--t-fast), box-shadow var(--t-fast), filter var(--t-fast);
+}
+
+.btn-gold:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.08);
+    box-shadow: 0 12px 30px rgba(212, 175, 55, .28);
+}
+
+@media (min-width: 760px) {
+    .inscripcion-card-principal {
+        transform: translateY(-8px);
+    }
+}

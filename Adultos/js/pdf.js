@@ -127,6 +127,7 @@
         dibujarCampo('Sensei / Instructor', c.sensei || '—');
         dibujarCampo('Grado', c.grado);
         dibujarCampo('Peso', c.peso ? c.peso + ' kg' : '—');
+        dibujarCampo('Altura', c.altura ? c.altura + ' cm' : '—');
         if (c.condiciones) {
             dibujarCampo('Condiciones médicas', c.condiciones);
         }
@@ -149,7 +150,7 @@
         dibujarCampo('Nombre completo', f.nombre);
         dibujarCampo('Identificación', f.identificacion);
         dibujarCampo('Aceptación', f.acepto ? 'SÍ' : 'NO');
-        dibujarCampo('Versión del documento', f.version || lib.version || 'v1.0-2027');
+        dibujarCampo('Fecha de aceptación', formatearFecha(f.fechaAceptacion || new Date().toISOString()));
 
         y += 3;
         separador();

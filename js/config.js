@@ -1,6 +1,6 @@
 /* =========================================================
    GUANA-CUP 2026 · config.js
-   Carga config.json, lo expone globalmente y aplica los
+   Carga la constante compartida de configuración, la expone globalmente y aplica los
    datos dinámicos al DOM de la landing.
    ========================================================= */
 
@@ -92,12 +92,6 @@
     // ------------------------------------------------------
     // Carga de JSON
     // ------------------------------------------------------
-    async function cargarJSON(ruta) {
-        const res = await fetch(ruta, { cache: 'no-store' });
-        if (!res.ok) throw new Error(`No se pudo cargar ${ruta}`);
-        return res.json();
-    }
-
     // ------------------------------------------------------
     // Determina si las inscripciones están activas
     // ------------------------------------------------------
@@ -155,9 +149,9 @@
         if (sinpeTitular && cfg.sinpe) sinpeTitular.textContent = cfg.sinpe.titular;
 
         // Fecha del torneo (contador)
-        const contadorFecha = $('.contador-fecha strong');
-        if (contadorFecha) {
-            contadorFecha.textContent = formatFechaLarga(cfg.fechaTorneo);
+        const contadorFechaLanding = $('.contador-fecha strong');
+        if (contadorFechaLanding) {
+            contadorFechaLanding.textContent = formatFechaLarga(cfg.fechaTorneo);
         }
 
         // Fecha límite (CTA final)
@@ -175,6 +169,28 @@
         const infoCategoria = $('#infoCategoria');
         if (infoCategoria) {
             infoCategoria.textContent = cfg.categoriaUnica || '';
+        }
+
+        const infoOrganizacion = $('#infoOrganizacion');
+        if (infoOrganizacion) infoOrganizacion.textContent = cfg.organizacion || '';
+
+        const infoFecha = $('#infoFecha');
+        if (infoFecha) infoFecha.textContent = formatFechaLarga(cfg.fechaTorneo);
+
+        const contadorFecha = $('#contadorFecha');
+        if (contadorFecha) contadorFecha.textContent = formatFechaLarga(cfg.fechaTorneo);
+
+        const precioMenores = $('#precioMenores');
+        const precioAdultos = $('#precioAdultos');
+        const precio = formatMoneda(cfg.precioInscripcion, cfg.simboloMoneda, cfg.locale);
+        if (precioMenores) precioMenores.textContent = precio;
+        if (precioAdultos) precioAdultos.textContent = precio;
+
+        const footerWhatsapp = $('#btnContactarAsesorFooter');
+        if (footerWhatsapp && cfg.whatsappOrganizador) {
+            footerWhatsapp.href = `https://wa.me/${cfg.whatsappOrganizador}`;
+            footerWhatsapp.target = '_blank';
+            footerWhatsapp.rel = 'noopener';
         }
 
         aplicarEstadoInscripciones();
@@ -213,9 +229,10 @@
     // ------------------------------------------------------
     // Inicialización
     // ------------------------------------------------------
-    async function init() {
+    function init() {
         try {
-            const config = await cargarJSON('data/config.json');
+            const config = window.TORNEO_CONFIG;
+            if (!config) throw new Error('No se encontró la configuración compartida del torneo.');
 
             window.APP.config = config;
             window.APP.bloquesEdad = config.bloquesEdad || [];

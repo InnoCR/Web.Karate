@@ -35,7 +35,7 @@
         document.addEventListener('gc2:config-listo', init, { once: true });
         setTimeout(() => {
             if (!window.GC2 || !window.GC2.config) {
-                console.error('[GC2] formulario.js: config no cargó en 5s. Revisa data/config.json.');
+                console.error('[GC2] formulario.js: config no cargó en 5s. Revisa data/config.js.');
             }
         }, 5000);
     }
@@ -173,7 +173,10 @@
         });
 
         steps.forEach((s) => {
-            s.classList.toggle('active', Number(s.dataset.step) <= n);
+            const paso = Number(s.dataset.step);
+            s.classList.remove('active', 'done');
+            if (paso === n) s.classList.add('active');
+            else if (paso < n) s.classList.add('done');
         });
 
         if (progressFill) {
@@ -332,6 +335,7 @@
             sensei: form.querySelector('#ad_sensei').value.trim(),
             grado: form.querySelector('#ad_grado').value,
             peso: form.querySelector('#ad_peso').value,
+            altura: form.querySelector('#ad_altura').value,
             condiciones: form.querySelector('#ad_condiciones').value.trim()
         };
     }
@@ -392,32 +396,54 @@
         const d = estado.datos;
         const f = estado.firma || window.GC2.liberacionUI.obtenerDatosFirma();
         const total = estado.monto;
+        const fechaNacimiento = d.fechaNacimiento
+            ? d.fechaNacimiento.split('-').reverse().join('/')
+            : '';
 
         cont.innerHTML = `
-      <div class="resumen-seccion">
-        <h4>Competidor</h4>
-        <p><strong>${esc(d.nombreCompleto)}</strong><br />
-          Edad al torneo: ${esc(d.edadCalculada)} · Sexo: ${d.sexo === 'M' ? 'Masculino' : 'Femenino'}<br />
-          Identificación: ${esc(d.identificacion)}<br />
-          Email: ${esc(d.email)} · Tel: ${esc(d.telefono)}
-        </p>
+      <div class="resumen-bloque">
+        <h3>Competidor</h3>
+        ${resumenFila('Nombre', d.nombreCompleto)}
+        ${resumenFila('Fecha de nacimiento', fechaNacimiento)}
+        ${resumenFila('Edad al torneo', d.edadCalculada)}
+        ${resumenFila('Sexo', d.sexo === 'M' ? 'Masculino' : d.sexo === 'F' ? 'Femenino' : d.sexo)}
+        ${resumenFila('Identificación', d.identificacion)}
+        ${d.email ? resumenFila('Correo', d.email) : ''}
+        ${resumenFila('Teléfono', d.telefono)}
       </div>
-      <div class="resumen-seccion">
-        <h4>Dojo</h4>
-        <p>${esc(d.dojo)}${d.sensei ? ' · Sensei: ' + esc(d.sensei) : ''}<br />
-          Grado: ${esc(d.grado)} · Peso: ${esc(d.peso)} kg
-        </p>
+
+      <div class="resumen-bloque">
+        <h3>Datos deportivos</h3>
+        ${resumenFila('Dojo / Academia', d.dojo)}
+        ${d.sensei ? resumenFila('Sensei / Instructor', d.sensei) : ''}
+        ${resumenFila('Grado', d.grado)}
+        ${resumenFila('Peso', d.peso ? d.peso + ' kg' : '')}
+        ${resumenFila('Altura', d.altura ? d.altura + ' cm' : '')}
+        ${d.condiciones ? resumenFila('Condiciones médicas', d.condiciones) : ''}
       </div>
-      ${d.condiciones ? `<div class="resumen-seccion"><h4>Condiciones médicas</h4><p>${esc(d.condiciones)}</p></div>` : ''}
-      <div class="resumen-seccion">
-        <h4>Liberación de responsabilidad</h4>
-        <p>✅ Aceptada · Versión ${esc(f.version || 'v1.0-2027')}</p>
+
+      <div class="resumen-bloque">
+        <h3>Liberación</h3>
+        ${resumenFila('Firmado por', f.nombre)}
+        ${resumenFila('Identificación', f.identificacion)}
+        ${resumenFila('Aceptada', '✅ Sí')}
       </div>
+
       <div class="resumen-total">
         <span>Total a pagar</span>
         <strong>${fmt(total)}</strong>
       </div>
     `;
+    }
+
+    function resumenFila(etiqueta, valor) {
+        if (valor == null || String(valor).trim() === '') return '';
+        return `<div class="resumen-fila"><span>${window.GC2.utils.escaparHTML(etiqueta)}</span><span>${window.GC2.utils.escaparHTML(valor)}</span></div>`;
+    }
+
+    function mostrarModalEspera(visible) {
+        const modal = document.getElementById('modalEspera');
+        if (modal) modal.hidden = !visible;
     }
 
     // ============================================
@@ -428,7 +454,17 @@
 
         const cfg = window.GC2.config;
         if (!cfg || !cfg.backend || !cfg.backend.url) {
-            alert('Falta configurar el backend en config.json');
+            alert('Falta configurar el backend en data/config.js');
+            return;
+        }
+
+        if (!validarPaso1()) {
+            mostrarPaso(1);
+            return;
+        }
+        capturarDatosCompetidor();
+        if (!validarEdadAdulto()) {
+            mostrarPaso(1);
             return;
         }
 
@@ -444,6 +480,7 @@
         btnConfirmar.disabled = true;
         const textoOriginal = btnConfirmar.textContent;
         btnConfirmar.textContent = 'Enviando…';
+        mostrarModalEspera(true);
 
         try {
             const payload = {
@@ -460,17 +497,14 @@
                     sensei: estado.datos.sensei,
                     grado: estado.datos.grado,
                     peso: estado.datos.peso,
+                    altura: estado.datos.altura,
                     condiciones: estado.datos.condiciones
                 },
                 firma: {
-                    nombre: estado.firma.nombre,
-                    identificacion: estado.firma.identificacion,
                     acepto: estado.firma.acepto,
                     fechaAceptacion: estado.firma.fechaAceptacion,
-                    version: estado.firma.version,
                     firmaImagen: estado.firma.firmaImagen
-                },
-                totalPagar: estado.monto
+                }
             };
 
             const controller = new AbortController();
@@ -529,6 +563,8 @@
             estado.enviando = false;
             btnConfirmar.disabled = false;
             btnConfirmar.textContent = textoOriginal;
+        } finally {
+            mostrarModalEspera(false);
         }
     }
 
@@ -552,19 +588,20 @@
         if (cont) {
             const d = estado.datos;
             cont.innerHTML = `
-        <div class="resumen-seccion">
-          <h4>Competidor</h4>
-          <p><strong>${esc(d.nombreCompleto)}</strong><br />
-            Edad al torneo: ${esc(d.edadCalculada)}<br />
-            Identificación: ${esc(d.identificacion)}<br />
-            Tel: ${esc(d.telefono)}
-          </p>
+        <div class="resumen-bloque">
+          <h3>Competidor</h3>
+          ${resumenFila('Nombre', d.nombreCompleto)}
+          ${resumenFila('Edad al torneo', d.edadCalculada)}
+          ${resumenFila('Identificación', d.identificacion)}
+          ${resumenFila('Teléfono', d.telefono)}
         </div>
-        <div class="resumen-seccion">
-          <h4>Dojo</h4>
-          <p>${esc(d.dojo)}${d.sensei ? ' · Sensei: ' + esc(d.sensei) : ''}<br />
-            Grado: ${esc(d.grado)} · Peso: ${esc(d.peso)} kg
-          </p>
+        <div class="resumen-bloque">
+          <h3>Datos deportivos</h3>
+          ${resumenFila('Dojo / Academia', d.dojo)}
+          ${d.sensei ? resumenFila('Sensei / Instructor', d.sensei) : ''}
+          ${resumenFila('Grado', d.grado)}
+          ${d.peso ? resumenFila('Peso', d.peso + ' kg') : ''}
+          ${d.altura ? resumenFila('Altura', d.altura + ' cm') : ''}
         </div>
       `;
         }
